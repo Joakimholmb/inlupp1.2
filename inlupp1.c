@@ -22,8 +22,9 @@ struct hash_table
 
 ioopm_hash_table_t *ioopm_hash_table_create();
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value);
-entry_t *entry_create(int key, char *value, entry_t *next);
-entry_t *find_previous_entry_for_key(entry_t *entry, int key);
+static entry_t *find_previous_entry_for_key(entry_t *entry, int key);
+static entry_t *entry_create(int key, char *value, entry_t *next);
+char *ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key);
 
 // *********************
 
@@ -41,28 +42,32 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value)
   int bucket = key % 17;
   /// Search for an existing entry for a key
   entry_t *entry = find_previous_entry_for_key(&ht->buckets[bucket], key);
-  entry_t *next = entry->next; 
+  entry_t *next = entry->next;
 
   /// Check if the next entry should be updated or not
+  //if (next != NULL && next->key == key)
   if (next != NULL && next->key == key)
     {
+      puts("Når if-sats");
       next->value = value;
     }
   else
     {
+      puts("når else sats");
       entry->next = entry_create(key, value, next);
     }
 
 }
 
-entry_t *find_previous_entry_for_key(entry_t *entry, int entrykey)
+static entry_t *find_previous_entry_for_key(entry_t *entry, int entrykey)
 {
+  /*
   entry_t *cursor = entry;
-  entry_t *next = cursor->next;
+  //entry_t *next = cursor->next;
   entry_t *tmp = cursor;
-  while(next != NULL && entrykey <= next->key)
+  while(cursor->next != NULL && entrykey <= cursor->next->key)
     {
-      if(entrykey == next->key)
+      if(entrykey == cursor->next->key)
         {
           return cursor;
         }
@@ -73,11 +78,28 @@ entry_t *find_previous_entry_for_key(entry_t *entry, int entrykey)
         }
     }
   return tmp;
+  */
+   entry_t *cursor = entry;
+   while(cursor->next != NULL && entrykey > cursor->next->key)
+    {
+      if(entrykey == cursor->next->key)
+        {
+          return cursor;
+        }     
+      else
+        {
+          cursor = cursor->next;
+        }
+    }
+   //printf("next key: %", cursor->next);
+  return cursor;
 }
 
-entry_t *entry_create(int key, char *value, entry_t *next)
+static entry_t *entry_create(int key, char *value, entry_t *next)
 {
-  entry_t *new = NULL;
+  entry_t *new = calloc(1, sizeof(entry_t));
+
+ //entry_t *new = NULL;
 
   new->key = key;
   new->value = value;
@@ -87,6 +109,23 @@ entry_t *entry_create(int key, char *value, entry_t *next)
   
 }
 
+char *ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key)
+{
+  /// Find the previous entry for key
+  entry_t *tmp = find_previous_entry_for_key(ht->buckets[key % 17], key);
+  entry_t *next = tmp->next;
+
+  if (next && next->key == key)
+    {
+      /// If entry was found, return its value...
+      return next->value;
+    }
+  else
+    {
+      /// ... else return NULL
+      return NULL; /// hmm...
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -114,12 +153,63 @@ int main(int argc, char *argv[])
   ht->buckets[0] = a;
   printf("Key: %d\nVal: %s\n", a.key, a.value);
   */
+  //entry_t *new = entry_create(2, argv[1], NULL);
+ 
 
+  //ioopm_hash_table_insert(ht, 4, "2342");
+
+  /*
+  printf("Key: %d\n", ht->buckets[5].key);
+  printf("Key: %d\n", ht->buckets[5].next->key);
+  printf("Key: %d\n", ht->buckets[5].next->next->key);
+  printf("Key: %d\n", ht->buckets[5].next->next->next->key);
+  
+  
+  while(ht->buckets[5].next != NULL)
+    {
+      printf("Key: %d\n", ht->buckets[5].key);
+    }
+  
+  
+  
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
-  //ioopm_hash_table_insert(ht, 1, argv[1]);
-  entry_t *new = entry_create(2, argv[1], NULL);
-  ht->buckets[0] = *new;
-  printf("Key: %d\nVal: %s\n", new->key, new->value);
+  entry_t c = { .key = 8, .value = "42424", .next = NULL };
+  entry_t a = { .key = 6, .value = "23", .next = &c };
+  entry_t b = { .key = 4, .value = "5555", .next = &a };
+  entry_t d = { .key = 0, .value = NULL, .next = &b };
+  ht->buckets[6] = d;
+  //entry_t *hitta = find_previous_entry_for_key(&d, 6);
+  //printf("Key: %d\n", hitta->key);
+
+  ioopm_hash_table_insert(ht, 6, "123");
+
+  int buck = 5 % 17;
+
+  entry_t *hitta = find_previous_entry_for_key(&ht->buckets[buck], 7);
+  printf("Key: %d\n", hitta->key);
+  */
+
+  
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  entry_t c = { .key = 8, .value = "42424", .next = NULL };
+  entry_t a = { .key = 6, .value = "23", .next = &c };
+  entry_t b = { .key = 4, .value = "5555", .next = &a };
+  entry_t d = { .key = 0, .value = NULL, .next = &b };
+  ht->buckets[6] = d;
+  //entry_t *hitta = find_previous_entry_for_key(&d, 5);
+  //printf("Key: %d\n", hitta->key);
+
+  ioopm_hash_table_insert(ht, 6, "123");
+
+  //int buck = 5 % 17;
+
+  //entry_t *hitta = find_previous_entry_for_key(&ht->buckets[buck], 7);
+  //printf("Key: %d\n", hitta->key);
+  
+  
+
+
+  
   
   return 0;
 }
