@@ -1,8 +1,11 @@
-prog: inlupp1.c
-	gcc -pedantic -Wall -g inlupp1.c -lcunit -o inlupp1
+prog: hash_table.c
+	gcc -pedantic -Wall -g hash_table.c -c -lcunit -o hash_table
 
-memtest: inlupp1.c
+valinlupp: hash_table.c
 	valgrind --tool=memcheck ./inlupp1
 
-tester: ioopm_hash_test.c
-	gcc -ggdb -Wall -std=c11 ioopm_hash_test.c inlupp1.c -lcunit -o tester
+runtest: ioopm_hash_test.c
+	gcc -ggdb -Wall -std=c11 ioopm_hash_test.c hash_table.c -lcunit -o tester
+
+valtest: inlupp1.c
+	valgrind --tool=memcheck ./tester
