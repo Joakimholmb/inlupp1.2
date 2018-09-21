@@ -16,8 +16,10 @@ option_t ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key);
 char *ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key);
 static char *destroy_next_entry(entry_t *entry);
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht);
-static void clear_bucket(entry_t *entry);
-
+static void clear_bucket(entry_t *entry, ioopm_hash_table_t *ht);
+size_t ioopm_hash_table_size(ioopm_hash_table_t *ht);
+bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht);
+void ioopm_hash_table_clear(ioopm_hash_table_t *ht);
 
 
 // **************************
@@ -48,6 +50,7 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value)
   else
     {
       entry->next = entry_create(key, value, next);
+      ht->size += 1;
     }
 
 }
@@ -106,6 +109,7 @@ char *ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key)
   if(previous->next != NULL)
     {
       char *value = destroy_next_entry(previous);
+      ht->size -= 1;
       return value;
     }
 
@@ -130,13 +134,14 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
     {
       entry_t *bucket = &ht->buckets[i];
       entry_t *entry = bucket->next;
-      clear_bucket(entry);
+      bucket->next = NULL;
+      clear_bucket(entry, ht);
     }
   free(ht);
   return;
 }
 
-static void clear_bucket(entry_t *entry)
+static void clear_bucket(entry_t *entry, ioopm_hash_table_t *ht)
 {
   if(entry == NULL)
     {
@@ -146,15 +151,40 @@ static void clear_bucket(entry_t *entry)
     {
       while(entry != NULL)
         {
+          printf("Entry key = %d", entry->key);
           entry_t *var = entry->next;
           free(entry);
           entry = var;
+          ht->size -= 1;
         }
     }
   return;
 }
 
-// **************** REKURSIV find_previous_entry_for_key, EJ ORGINAL
+size_t ioopm_hash_table_size(ioopm_hash_table_t *ht)
+{
+  
+  return ht->size;
+}
+
+bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht)
+{
+  return ioopm_hash_table_size(ht) == 0;
+}
+
+void ioopm_hash_table_clear(ioopm_hash_table_t *ht)
+{
+  for(int i = 0; i<No_Buckets; ++i)
+    {
+      entry_t *bucket = &ht->buckets[i];
+      entry_t *entry = bucket->next;
+      bucket->next = NULL;
+      clear_bucket(entry, ht);
+    }
+  return;
+}
+
+// **************** RECURSIVE find_previous_entry_for_key, NOT ORIGINAL
 /*
   static entry_t *find_previous_entry_for_key(entry_t *entry, int entrykey)
   {

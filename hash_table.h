@@ -15,6 +15,7 @@ struct entry
 struct hash_table
 {
   entry_t buckets[17];
+  size_t size;
 };
 
 typedef struct option option_t;
@@ -29,5 +30,8 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value);
 option_t ioopm_hash_table_lookup(ioopm_hash_table_t *ht, int key);
 char *ioopm_hash_table_remove(ioopm_hash_table_t *ht, int key);
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht);
+size_t ioopm_hash_table_size(ioopm_hash_table_t *ht);
+bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht);
+void ioopm_hash_table_clear(ioopm_hash_table_t *ht);
 
 #endif

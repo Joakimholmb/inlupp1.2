@@ -34,6 +34,26 @@ int clean_suite_remove(void)
   return 0;
 }
 
+int init_suite_size(void)
+{
+  return 0;
+}
+
+int clean_suite_size(void)
+{
+  return 0;
+}
+
+int init_suite_clear(void)
+{
+  return 0;
+}
+
+int clean_suite_clear(void)
+{
+  return 0;
+}
+
 
 //************ TODO: EGNA TESTFUNKTIONER
 
@@ -86,6 +106,79 @@ void test_remove2()
   ioopm_hash_table_destroy(ht);
 }
 
+void test_size1()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 0);
+  CU_ASSERT_TRUE(ioopm_hash_table_is_empty(ht));
+  
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_size2()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  ioopm_hash_table_insert(ht, 14, "123");
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 1);
+  
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_size3()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  ioopm_hash_table_insert(ht, 14, "123");
+  ioopm_hash_table_remove(ht, 14);
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 0);
+  CU_ASSERT_TRUE(ioopm_hash_table_is_empty(ht));
+  
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_clear1()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  ioopm_hash_table_insert(ht, 1, "123");
+  ioopm_hash_table_clear(ht);
+  
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 0);
+  CU_ASSERT_TRUE(ioopm_hash_table_is_empty(ht));
+  
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_clear2()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  ioopm_hash_table_clear(ht);
+  
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 0);
+  CU_ASSERT_TRUE(ioopm_hash_table_is_empty(ht));
+  
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_clear3()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  ioopm_hash_table_insert(ht, 3, "333");
+  ioopm_hash_table_remove(ht, 3);
+
+  ioopm_hash_table_clear(ht);
+  
+  CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 0);
+  CU_ASSERT_TRUE(ioopm_hash_table_is_empty(ht));
+  
+  ioopm_hash_table_destroy(ht);
+}
+
+
 
 
 //****************** TODO: EGNA KÖRNINGAR
@@ -94,6 +187,8 @@ int main()
   CU_pSuite pSuiteLookup = NULL;
   CU_pSuite pSuiteInsert = NULL;
   CU_pSuite pSuiteRemove = NULL;
+  CU_pSuite pSuiteSize = NULL;
+  CU_pSuite pSuiteClear = NULL;
 
   if (CUE_SUCCESS != CU_initialize_registry())
     return CU_get_error();
@@ -139,9 +234,39 @@ int main()
       CU_cleanup_registry();
       return CU_get_error();
     }
+
+  // SIZE SUITE
+
+  pSuiteSize = CU_add_suite("Size Suite", init_suite_size, clean_suite_size);
+  if(NULL == pSuiteSize)
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  if((NULL == CU_add_test(pSuiteSize, "test of size()", test_size1)) || (NULL == CU_add_test(pSuiteSize, "test of size()", test_size2)) || (NULL == CU_add_test(pSuiteSize, "test of size()", test_size3)))
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  // CLEAR SUITE
+
+  pSuiteClear = CU_add_suite("Clear Suite", init_suite_clear, clean_suite_clear);
+  if(NULL == pSuiteClear)
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  if((NULL == CU_add_test(pSuiteClear, "test of clear()", test_clear1)) || (NULL == CU_add_test(pSuiteClear, "test of clear()", test_clear2)) || (NULL == CU_add_test(pSuiteClear, "test of clear()", test_clear3)))
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
   
 
-  // RUN TESTS
+    // RUN TESTS
 
   CU_basic_set_mode(CU_BRM_VERBOSE);
   CU_basic_run_tests();
