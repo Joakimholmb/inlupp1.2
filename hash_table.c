@@ -6,6 +6,29 @@
 
 #define No_Buckets 17
 
+struct entry
+{
+  int key;       // holds the key
+  char *value;   // holds the value
+  entry_t *next; // points to the next entry (possibly NULL)
+};
+
+struct hash_table
+{
+  entry_t buckets[17];
+  size_t size;
+};
+
+struct option
+{
+  bool defined;
+  char *value;
+};
+
+typedef bool(*ioopm_apply_function)(int key, char *value, void *extra);
+typedef void(*ioopm_apply_function2)(int key, char *value, void *extra);
+
+
 // FUNCTION DECLARATIONS
 
 ioopm_hash_table_t *ioopm_hash_table_create();
@@ -20,6 +43,17 @@ static void clear_bucket(entry_t *entry, ioopm_hash_table_t *ht);
 size_t ioopm_hash_table_size(ioopm_hash_table_t *ht);
 bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht);
 void ioopm_hash_table_clear(ioopm_hash_table_t *ht);
+int *ioopm_hash_table_keys(ioopm_hash_table_t *ht);
+char **ioopm_hash_table_values(ioopm_hash_table_t *ht);
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, int key);
+bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, char *value);
+bool ioopm_hash_table_all(ioopm_hash_table_t *ht, ioopm_apply_function pred, void *arg);
+bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_apply_function pred, void *arg);
+void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_apply_function2 apply_fun, void *arg);
+static bool key_equiv(int key, char *value_ignored, void *x);
+static bool value_equiv(int key_ignored, char *value, void *x);
+void convert_strings(ioopm_hash_table_t *ht, char *value);
+static void convertvalue(int key_ignored, char *value, void *x);
 
 
 // **************************
@@ -54,7 +88,7 @@ void ioopm_hash_table_insert(ioopm_hash_table_t *ht, int key, char *value)
     }
 
 }
-
+/*
 static entry_t *find_previous_entry_for_key(entry_t *entry, int key)
 {
    entry_t *cursor = entry;
@@ -73,7 +107,7 @@ static entry_t *find_previous_entry_for_key(entry_t *entry, int key)
    
   return cursor;
 }
-
+*/
 static entry_t *entry_create(int key, char *value, entry_t *next)
 {
   entry_t *new_entry = calloc(1, sizeof(entry_t));
@@ -131,6 +165,7 @@ static char *destroy_next_entry(entry_t *entry)
 void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
 {
   for(int i = 0; i<No_Buckets; ++i)
+
     {
       entry_t *bucket = &ht->buckets[i];
       entry_t *entry = bucket->next;
@@ -151,7 +186,6 @@ static void clear_bucket(entry_t *entry, ioopm_hash_table_t *ht)
     {
       while(entry != NULL)
         {
-          printf("Entry key = %d", entry->key);
           entry_t *var = entry->next;
           free(entry);
           entry = var;
@@ -184,26 +218,180 @@ void ioopm_hash_table_clear(ioopm_hash_table_t *ht)
   return;
 }
 
+int *ioopm_hash_table_keys(ioopm_hash_table_t *ht)
+{
+  int *keys = calloc(1, sizeof(ht->size));
+  int j = 0;
+  for(int i = 0; i<No_Buckets; ++i)
+    {
+      entry_t *dummy_entry = &ht->buckets[i];
+      entry_t *entry = dummy_entry->next;
+      while (entry != NULL)
+        {
+          keys[j] = entry->key;
+          ++j;
+          entry = entry->next;
+        }
+    }
+  return keys;
+}
+
+char **ioopm_hash_table_values(ioopm_hash_table_t *ht)
+{
+  char **values = calloc(1, sizeof(ht->size));
+  int j = 0;
+  for(int i = 0; i<No_Buckets; ++i)
+    {
+      entry_t *dummy_entry = &ht->buckets[i];
+      entry_t *entry = dummy_entry->next;
+      while (entry != NULL)
+        {
+          values[j] = entry->value;
+          ++j;
+          entry = entry->next;
+        }
+    }
+  return values;
+}
+
+bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, int key)
+{
+  //return ioopm_hash_table_lookup(ht, key).defined;
+  return ioopm_hash_table_any(ht, key_equiv, &key);
+}
+
+bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, char *value)
+{
+  return ioopm_hash_table_any(ht, value_equiv, value);
+  /*
+  char **values = ioopm_hash_table_values(ht);
+  int i = 0;
+
+  for(; i<ht->size; ++i)
+    {
+      if(value == values[i])
+        {
+          free(values);
+          return true;
+        }
+    }
+  free(values);
+  return false;
+  */
+}
+
+bool ioopm_hash_table_all(ioopm_hash_table_t *ht, ioopm_apply_function pred, void *arg)
+{
+  for(int i = 0; i<No_Buckets; ++i)
+    {
+      entry_t *bucket  = &ht->buckets[i];
+      entry_t *entry = bucket->next;
+      while(entry != NULL)
+        {
+          if(!(pred(entry->key, entry->value, arg)))
+            {
+              return false;
+            }
+          entry = entry->next;
+        }     
+    }
+  return true;
+}
+
+bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_apply_function pred, void *arg)
+{
+  for(int i = 0; i<No_Buckets; ++i)
+    {
+      entry_t *entry  = &ht->buckets[i];
+      //entry_t *entry = bucket->next;
+      while(entry != NULL)
+        {
+          if(pred(entry->key, entry->value, arg) == true)
+            {
+              return true;
+            }
+          else
+            {
+              entry = entry->next;
+            }
+        }     
+    }
+  return false;
+}
+
+void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_apply_function2 apply_fun, void *arg)
+{
+  for(int i = 0; i<No_Buckets; ++i)
+    {
+      entry_t *bucket  = &ht->buckets[i];
+      entry_t *entry = bucket->next;
+      while(entry != NULL)
+        {
+          apply_fun(entry->key, entry->value, arg);
+          entry = entry->next;
+        }     
+    }
+  return;
+}
+
+static bool key_equiv(int key, char *value_ignored, void *x)
+{
+  int *other_key_ptr = x;
+  int other_key = *other_key_ptr;
+  return key == other_key;
+}
+
+static bool value_equiv(int key_ignored, char *value, void *x)
+{
+  char *other_value_ptr = x;
+  char *other_value = other_value_ptr;
+  return value == other_value;
+}
+
+void convert_strings(ioopm_hash_table_t *ht, char *value)
+{
+  //return ioopm_hash_table_lookup(ht, key).defined;
+  ioopm_hash_table_apply_to_all(ht, convertvalue, value);
+  return;
+}
+
+static void convertvalue(int key_ignored, char *value, void *x)
+{
+  char *other_value_ptr = x;
+  char *other_value = other_value_ptr;
+  value = other_value;
+  return;
+}
+
 // **************** RECURSIVE find_previous_entry_for_key, NOT ORIGINAL
-/*
-  static entry_t *find_previous_entry_for_key(entry_t *entry, int entrykey)
-  {
+
+static entry_t *find_previous_entry_for_key(entry_t *entry, int entrykey)
+{
 
   entry_t *cursor = entry;
+  entry_t *entry_next = cursor->next;
 
-  if(cursor->next == NULL)
-  {
-  return cursor;
-  }
-  if(cursor->next->key == entrykey)
-  {
-  return cursor;
-    }
-  if(entrykey < cursor->next->key)
+  if(entry_next == NULL || entry_next->key == entrykey || entrykey < entry_next->key)
     {
       return cursor;
     }
-  return find_previous_entry_for_key(cursor->next, entrykey);
+  return find_previous_entry_for_key(entry_next, entrykey);
+}
+
+// **********************
+/*
+int main()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  
+  ioopm_hash_table_insert(ht, 6, "5555");
+  ioopm_hash_table_insert(ht, 23, "666");
+  ioopm_hash_table_insert(ht, 40, "123");
+
+  entry_t *hej = find_previous_entry_for_key(&ht->buckets[6], 23);
+  printf("Previous: %d\n", hej->key);
+  
+
+  ioopm_hash_table_destroy(ht);
 }
 */
-// **********************
