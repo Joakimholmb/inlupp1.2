@@ -1,4 +1,16 @@
+/*
+TODO:
+
+Fixa apply_to_all så tester funkar.
+Fixa ioopm_hash_table_all tester.
+Lägg till Typ till ioopm_apply func & ändra i h.- och .c filen där de förekommer.
+Hur placera in den i h. filen.
+
+*/
+
+
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <CUnit/CUnit.h>
@@ -25,8 +37,8 @@ struct option
   char *value;
 };
 
-typedef bool(*ioopm_apply_function)(int key, char *value, void *extra);
-typedef void(*ioopm_apply_function2)(int key, char *value, void *extra);
+//typedef bool(*ioopm_apply_function)(int key, char *value, void *extra);
+//typedef void(*ioopm_apply_function2)(int key, char *value, void *extra);
 
 
 // FUNCTION DECLARATIONS
@@ -52,8 +64,6 @@ bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_apply_function pred, voi
 void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_apply_function2 apply_fun, void *arg);
 static bool key_equiv(int key, char *value_ignored, void *x);
 static bool value_equiv(int key_ignored, char *value, void *x);
-void convert_strings(ioopm_hash_table_t *ht, char *value);
-static void convertvalue(int key_ignored, char *value, void *x);
 
 
 // **************************
@@ -327,7 +337,7 @@ void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_apply_function2
       entry_t *entry = bucket->next;
       while(entry != NULL)
         {
-          apply_fun(entry->key, entry->value, arg);
+          apply_fun(entry->key, &(entry->value), arg);
           entry = entry->next;
         }     
     }
@@ -346,21 +356,6 @@ static bool value_equiv(int key_ignored, char *value, void *x)
   char *other_value_ptr = x;
   char *other_value = other_value_ptr;
   return value == other_value;
-}
-
-void convert_strings(ioopm_hash_table_t *ht, char *value)
-{
-  //return ioopm_hash_table_lookup(ht, key).defined;
-  ioopm_hash_table_apply_to_all(ht, convertvalue, value);
-  return;
-}
-
-static void convertvalue(int key_ignored, char *value, void *x)
-{
-  char *other_value_ptr = x;
-  char *other_value = other_value_ptr;
-  value = other_value;
-  return;
 }
 
 // **************** RECURSIVE find_previous_entry_for_key, NOT ORIGINAL
