@@ -1,6 +1,16 @@
 #include <string.h>
+#include <stdlib.h>
 #include "CUnit/Basic.h"
 #include "hash_table.h"
+
+
+// FIXA OPTION_T problem
+struct option
+{
+  bool defined;
+  char *value;
+};
+
 
 //static FILE* temp_file = NULL;
 
@@ -54,6 +64,65 @@ int clean_suite_clear(void)
   return 0;
 }
 
+int init_suite_getkeys(void)
+{
+  return 0;
+}
+
+int clean_suite_getkeys(void)
+{
+  return 0;
+}
+
+int init_suite_getvalues(void)
+{
+  return 0;
+}
+
+int clean_suite_getvalues(void)
+{
+  return 0;
+}
+
+int init_suite_haskey(void)
+{
+  return 0;
+}
+
+int clean_suite_haskey(void)
+{
+  return 0;
+}
+
+int init_suite_hasvalue(void)
+{
+  return 0;
+}
+
+int clean_suite_hasvalue(void)
+{
+  return 0;
+}
+
+int init_suite_ApplyToAll(void)
+{
+  return 0;
+}
+
+int clean_suite_ApplyToAll(void)
+{
+  return 0;
+}
+
+int init_suite_All(void)
+{
+  return 0;
+}
+
+int clean_suite_All(void)
+{
+  return 0;
+}
 
 //************ TODO: EGNA TESTFUNKTIONER
 
@@ -178,10 +247,209 @@ void test_clear3()
   ioopm_hash_table_destroy(ht);
 }
 
+void test_getkeys1()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  ioopm_hash_table_insert(ht, 3, "333");
+  ioopm_hash_table_insert(ht, 12, "421");
+
+  int *keys = ioopm_hash_table_keys(ht);
+
+  
+  CU_ASSERT_EQUAL(keys[0], 3);
+  CU_ASSERT_EQUAL(keys[1], 12);
+  
+  free(keys);
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_getkeys2()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  int *keys = ioopm_hash_table_keys(ht);
+
+  
+  CU_ASSERT_PTR_NULL(keys[0]);
+  //CU_ASSERT_EQUAL(keys[16], NULL);
+  
+  free(keys);
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_getkeys3()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  int *keys = ioopm_hash_table_keys(ht);
+
+  ioopm_hash_table_insert(ht, 5, "59");
+  ioopm_hash_table_remove(ht, 5);
+  
+  CU_ASSERT_PTR_NULL(keys[0]);
+  
+  free(keys);
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_getvalues1()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  ioopm_hash_table_insert(ht, 3, "333");
+  ioopm_hash_table_insert(ht, 12, "421");
+
+  char **values = ioopm_hash_table_values(ht);
+
+  
+  CU_ASSERT_EQUAL(values[0], "333");
+  CU_ASSERT_EQUAL(values[1], "421");
+  
+  free(values);
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_getvalues2()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char **values = ioopm_hash_table_values(ht);
+
+  
+  CU_ASSERT_EQUAL(values[0], NULL);
+  CU_ASSERT_EQUAL(values[16], NULL);
+  
+  free(values);
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_getvalues3()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char **values = ioopm_hash_table_values(ht);
+
+  ioopm_hash_table_insert(ht, 5, "59");
+  ioopm_hash_table_remove(ht, 5);
+  
+  CU_ASSERT_EQUAL(values[0], NULL);
+  
+  free(values);
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_haskey1()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  ioopm_hash_table_insert(ht, 5, "59");
+  
+  CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, 5));
+  
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_haskey2()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  
+  CU_ASSERT_FALSE(ioopm_hash_table_has_key(ht, 3));
+  
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_hasvalue1()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  ioopm_hash_table_insert(ht, 5, "59");
+  
+  CU_ASSERT_TRUE(ioopm_hash_table_has_value(ht, "59"));
+  
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_hasvalue2()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+  
+  CU_ASSERT_FALSE(ioopm_hash_table_has_value(ht, "4"));
+  
+  ioopm_hash_table_destroy(ht);
+}
+
+void test_hasvalue3()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  ioopm_hash_table_insert(ht, 5, "59");
+  ioopm_hash_table_remove(ht, 5);
+  
+  CU_ASSERT_FALSE(ioopm_hash_table_has_value(ht, "59"));
+  
+  ioopm_hash_table_destroy(ht);
+}
+
+void aux_apply_to_all(int key_ignored, char **value, void *x)
+{
+  (*value)[1] = '\0';
+
+  return;
+}
 
 
+void test_apply_to_all()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
-//****************** TODO: EGNA KÖRNINGAR
+  char str[] = "50";
+  char str2[] = "80";
+
+  ioopm_hash_table_insert(ht, 2, str);
+  ioopm_hash_table_insert(ht, 30, str2);
+
+  ioopm_hash_table_apply_to_all(ht, aux_apply_to_all, NULL);
+  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, 2).value, "5");
+  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, 30).value, "8");
+  
+  ioopm_hash_table_destroy(ht);
+}
+
+bool aux_all(int key_ignored, char *value, void *x)
+{
+  if(value[0] == '5' && value[1] == '2')
+    {
+      return true;
+    }
+
+  return false;
+}
+
+void test_all()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create();
+
+  char str[] = "52";
+  char str2[] = "52";
+  char str3[] = "52";
+
+  ioopm_hash_table_insert(ht, 4, str);
+  ioopm_hash_table_insert(ht, 44, str2);
+  ioopm_hash_table_insert(ht, 6, str3);
+
+  
+  CU_ASSERT_TRUE(ioopm_hash_table_all(ht, aux_all, NULL))
+  
+  ioopm_hash_table_destroy(ht);
+}
+
+
+//******************
+
+//      MAIN
+
+//******************
 int main()
 {
   CU_pSuite pSuiteLookup = NULL;
@@ -189,6 +457,12 @@ int main()
   CU_pSuite pSuiteRemove = NULL;
   CU_pSuite pSuiteSize = NULL;
   CU_pSuite pSuiteClear = NULL;
+  CU_pSuite pSuiteGetKeys = NULL;
+  CU_pSuite pSuiteGetValues = NULL;
+  CU_pSuite pSuiteHasKey = NULL;
+  CU_pSuite pSuiteHasValue = NULL;
+  CU_pSuite pSuiteApplyToAll = NULL;
+  CU_pSuite pSuiteAll = NULL;
 
   if (CUE_SUCCESS != CU_initialize_registry())
     return CU_get_error();
@@ -264,9 +538,98 @@ int main()
       CU_cleanup_registry();
       return CU_get_error();
     }
-  
 
-    // RUN TESTS
+  // GETKEYS SUITE
+
+  pSuiteGetKeys = CU_add_suite("GetKeys Suite", init_suite_getkeys, clean_suite_getkeys);
+  if(NULL == pSuiteGetKeys)
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  if((NULL == CU_add_test(pSuiteGetKeys, "test of getkeys1()", test_getkeys1)) || (NULL == CU_add_test(pSuiteGetKeys, "test of getkeys2()", test_getkeys2)) || (NULL == CU_add_test(pSuiteGetKeys, "test of getkeys3()", test_getkeys3)))
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  // GETVALUES SUITE
+
+  pSuiteGetValues = CU_add_suite("Getvalues Suite", init_suite_getvalues, clean_suite_getvalues);
+  if(NULL == pSuiteGetValues)
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  if((NULL == CU_add_test(pSuiteGetValues, "test of getvalues1()", test_getvalues1)) || (NULL == CU_add_test(pSuiteGetValues, "test of getvalues2()", test_getvalues2)) || (NULL == CU_add_test(pSuiteGetValues, "test of getvalues3()", test_getvalues3)))
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  // HASKEY SUITE
+  
+  pSuiteHasKey = CU_add_suite("HasKey Suite", init_suite_haskey, clean_suite_haskey);
+  if(NULL == pSuiteHasKey)
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  if((NULL == CU_add_test(pSuiteHasKey, "test of haskey1()", test_haskey1) || (NULL == CU_add_test(pSuiteHasKey, "test of haskey2()", test_haskey2))))
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+  
+  // HASVALUE SUITE
+
+  pSuiteHasValue = CU_add_suite("Hasvalue Suite", init_suite_hasvalue, clean_suite_hasvalue);
+  if(NULL == pSuiteHasValue)
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  if((NULL == CU_add_test(pSuiteHasValue, "test of hasvalue1()", test_hasvalue1) || (NULL == CU_add_test(pSuiteHasValue, "test of hasvalue2()", test_hasvalue2)) || (NULL == CU_add_test(pSuiteHasValue, "test of hasvalue3()", test_hasvalue3))))
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  // APPLTOALL SUITE
+
+  pSuiteApplyToAll = CU_add_suite("ApplyToAll Suite", init_suite_ApplyToAll, clean_suite_ApplyToAll);
+  if(NULL == pSuiteApplyToAll)
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  if(NULL == CU_add_test(pSuiteApplyToAll, "test of ApplyToAll()", test_apply_to_all))
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  // APPLTOALL SUITE
+
+  pSuiteAll = CU_add_suite("All Suite", init_suite_All, clean_suite_All);
+  if(NULL == pSuiteAll)
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  if(NULL == CU_add_test(pSuiteAll, "test of All()", test_all))
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+  
+  // RUN TESTS
 
   CU_basic_set_mode(CU_BRM_VERBOSE);
   CU_basic_run_tests();

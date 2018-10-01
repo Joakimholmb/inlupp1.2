@@ -374,7 +374,7 @@ static entry_t *find_previous_entry_for_key(entry_t *entry, int entrykey)
 }
 
 // **********************
-/*
+
 int main()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
@@ -383,10 +383,15 @@ int main()
   ioopm_hash_table_insert(ht, 23, "666");
   ioopm_hash_table_insert(ht, 40, "123");
 
-  entry_t *hej = find_previous_entry_for_key(&ht->buckets[6], 23);
-  printf("Previous: %d\n", hej->key);
+  char **values = ioopm_hash_table_values(ht);
+
+  for(int i = 0; i<3; i++)
+    {
+      printf("Value[%d] = %s\n", i, *values);
+      values++;
+    }
   
 
   ioopm_hash_table_destroy(ht);
 }
-*/
+
