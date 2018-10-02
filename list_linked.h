@@ -5,11 +5,16 @@
 typedef int elem_t;
 typedef struct link link_t;
 typedef struct list ioopm_list_t; /// Meta: struct definition goes in C file
+//typedef struct list_last last_t;
 
 ioopm_list_t *ioopm_linked_list_create();
 void ioopm_linked_list_destroy(ioopm_list_t *list);
 void ioopm_linked_list_insert(ioopm_list_t *list, int index, int value);
 int ioopm_linked_list_get(ioopm_list_t *list, int index);
+void ioopm_linked_list_append(ioopm_list_t *list, int value);
+void ioopm_linked_list_prepend(ioopm_list_t *list, int value);
+void ioopm_linked_list_clear(ioopm_list_t *list);
+elem_t ioopm_linked_list_remove(ioopm_list_t *list, int index);
 
 /// FIXME: better comments here
 /// @brief Creates a new empty list
