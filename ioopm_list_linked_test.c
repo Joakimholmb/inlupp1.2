@@ -209,6 +209,8 @@ void test_iter_insert1()
 
   ioopm_iterator_destroy(iterator);
   ioopm_linked_list_destroy(list);
+ 
+  
 }
 
 void test_iter_insert2()
@@ -218,6 +220,22 @@ void test_iter_insert2()
   ioopm_iterator_insert(iterator, 5);
   CU_ASSERT_EQUAL(ioopm_iterator_current(iterator), 5);
   ioopm_iterator_insert(iterator, 3);
+  CU_ASSERT_EQUAL(ioopm_iterator_current(iterator), 3);
+  ioopm_iterator_next(iterator);
+  CU_ASSERT_EQUAL(ioopm_iterator_current(iterator), 5);
+
+  ioopm_iterator_destroy(iterator);
+  ioopm_linked_list_destroy(list);
+}
+
+void test_iter_insert3()
+{
+  ioopm_list_t *list = ioopm_linked_list_create();
+  ioopm_list_iterator_t *iterator = ioopm_list_iterator(list);
+  ioopm_iterator_insert(iterator, 2);
+  ioopm_iterator_insert(iterator, 3);
+  ioopm_iterator_insert(iterator, 4);
+  ioopm_iterator_next(iterator);
   CU_ASSERT_EQUAL(ioopm_iterator_current(iterator), 3);
 
   ioopm_iterator_destroy(iterator);
@@ -248,6 +266,22 @@ void test_iter_has_next2()
   ioopm_linked_list_destroy(list);
 }
 
+//************** RESET TEST ***************
+
+void test_iter_reset1()
+{
+  ioopm_list_t *list = ioopm_linked_list_create();
+  ioopm_list_iterator_t *iterator = ioopm_list_iterator(list);
+  ioopm_iterator_insert(iterator, 5);
+  ioopm_iterator_insert(iterator, 3);
+  ioopm_iterator_next(iterator);
+  ioopm_iterator_reset(iterator);
+  CU_ASSERT_EQUAL(ioopm_iterator_current(iterator), 3)
+
+  ioopm_iterator_destroy(iterator);
+  ioopm_linked_list_destroy(list);
+}
+
 //******************
 
 //      MAIN
@@ -263,6 +297,7 @@ int main()
   CU_pSuite pSuiteApplyAll = NULL;
   CU_pSuite pSuiteIterInsert = NULL;
   CU_pSuite pSuiteIterHasNext = NULL;
+  CU_pSuite pSuiteIterReset = NULL;
   
   if (CUE_SUCCESS != CU_initialize_registry())
     return CU_get_error();
@@ -352,6 +387,11 @@ int main()
       return CU_get_error();
     }
 
+
+
+
+
+  
   //Iterator_insert suite
   pSuiteIterInsert = CU_add_suite("Iter_Insert Suite", init_suite, clean_suite);
   if(NULL == pSuiteIterInsert)
@@ -360,12 +400,13 @@ int main()
       return CU_get_error();
     }
 
-  if(NULL == CU_add_test(pSuiteIterInsert, "test of iter_insert1()", test_iter_insert1) || (NULL == CU_add_test(pSuiteIterInsert, "test of iter_insert2()", test_iter_insert2)))
+  if(NULL == CU_add_test(pSuiteIterInsert, "test of iter_insert1()", test_iter_insert1) || (NULL == CU_add_test(pSuiteIterInsert, "test of iter_insert2()", test_iter_insert2) || (NULL == CU_add_test(pSuiteIterInsert, "test of iter_insert3()", test_iter_insert3))))
     {
       CU_cleanup_registry();
       return CU_get_error();
     }
 
+  
   //Iterator_has_next SUITE
   pSuiteIterHasNext = CU_add_suite("Iter_has_next Suite", init_suite, clean_suite);
   if(NULL == pSuiteIterHasNext)
@@ -379,6 +420,21 @@ int main()
       CU_cleanup_registry();
       return CU_get_error();
     }
+
+  //Iterator_reset SUITE
+  pSuiteIterReset = CU_add_suite("Iter_reset Suite", init_suite, clean_suite);
+  if(NULL == pSuiteIterReset)
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  if(NULL == CU_add_test(pSuiteIterReset, "test of iter_reset1()", test_iter_reset1))
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+  
 
   
   // RUN TESTS

@@ -22,6 +22,7 @@ struct list
 
 struct iter 
 {
+  link_t *prev;
   link_t *current;
   ioopm_list_t *list;
 };
@@ -57,7 +58,7 @@ void ioopm_iterator_insert(ioopm_list_iterator_t *iter, int element);
 void ioopm_iterator_reset(ioopm_list_iterator_t *iter);
 int ioopm_iterator_current(ioopm_list_iterator_t *iter);
 void ioopm_iterator_destroy(ioopm_list_iterator_t *iter);
-
+static link_t *insert_aux(link_t *link, int elem);
 /*
 
   FUNKTIONER
@@ -333,8 +334,9 @@ ioopm_list_iterator_t *ioopm_list_iterator(ioopm_list_t *list)
 {
   ioopm_list_iterator_t *result = calloc(1, sizeof(ioopm_list_iterator_t));
 
+  result->list = list;
   result->current = list->first;
-  
+  result->prev = list->first;
   return result;  
 }
 
@@ -349,6 +351,14 @@ bool ioopm_iterator_has_next(ioopm_list_iterator_t *iter)
 
 int ioopm_iterator_next(ioopm_list_iterator_t *iter)
 {
+  
+  //if (iter->list->first == iter->current && iter->current->next->next == NULL)
+  if(iter->prev == iter->current)
+    {
+      iter->current = iter->current->next;
+      return iter->current->element;
+    }
+  iter->prev = iter->current;
   iter->current = iter->current->next;
   return iter->current->element; 
 }
@@ -357,28 +367,56 @@ int ioopm_iterator_remove(ioopm_list_iterator_t *iter)
 {
 
   link_t *to_remove = iter->current;
-
+  iter->prev->next = to_remove->next;
+  if(to_remove->next == NULL)
+    {
+      
+      free(to_remove);
+      iter->current = NULL;
+      return to_remove->element;
+    }
+  
   iter->current = to_remove->next;
   int value = to_remove->element;
 
   free(to_remove);
   return value;
 }
-void ioopm_iterator_insert(ioopm_list_iterator_t *iter, int element)
+void ioopm_iterator_insert(ioopm_list_iterator_t *iter, int elem)
 {
   if (iter->current == NULL)
     {
-      iter->current = calloc(1, sizeof(link_t));
-      iter->current->element = element;
-      iter->current->next = NULL;
+      iter->current = insert_aux(NULL, elem);
       iter->list->first = iter->current;
+      iter->prev = iter->current;
+      return;
+      
     }
-  iter->current->next = calloc(1, sizeof(link_t));
-  link_t *next_link = iter->current;
-  iter->current->element = element;
-  iter->current->next = next_link;
+  // && iter->current->next == NULL
+  else if (iter->current == iter->list->first)
+    {
+      //iter->current = insert_aux(iter->current, elem);
+      link_t *new_link = insert_aux(iter->current, elem);
+      new_link->next = iter->current;
+      iter->current = new_link;
+      iter->list->first = iter->current;
+      iter->prev = iter->current;
+      return;
+    }
+  iter->current = insert_aux(iter->current, elem);
+  iter->prev->next = iter->current;
   return;
 }
+
+static link_t *insert_aux(link_t *link , int elem)
+{
+
+  link_t *new_link = calloc(1, sizeof(link_t));
+  new_link->element = elem;
+  new_link->next = link;
+  return new_link;
+}
+
 void ioopm_iterator_reset(ioopm_list_iterator_t *iter)
 {
   iter->current = iter->list->first;
@@ -386,15 +424,20 @@ void ioopm_iterator_reset(ioopm_list_iterator_t *iter)
 }
 int ioopm_iterator_current(ioopm_list_iterator_t *iter)
 {
+  if(iter->current == NULL)
+    {
+      return 0; //TODO: Lägg till error
+    }
+  
   return iter->current->element; 
 }
 void ioopm_iterator_destroy(ioopm_list_iterator_t *iter)
 {
   ioopm_iterator_reset(iter);
-  while(iter->current != NULL)
+  printf("1st elem is %d\n", iter->current->element);
+  while(iter->current != NULL && iter->current->next != NULL)
     {
       ioopm_iterator_remove(iter);
-      iter->current = iter->current->next;
     }
   free(iter);
   return;
