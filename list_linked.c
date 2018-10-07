@@ -1,8 +1,10 @@
 //#include <stdlib.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include "list_linked.h"
-#include "iterator.h"
+//#include "iterator.h"
 #include <errno.h>
 
 extern int errno;
@@ -166,7 +168,7 @@ void ioopm_linked_list_insert(ioopm_list_t *list, size_t index, elem_t value)
 
 elem_t ioopm_linked_list_get(ioopm_list_t *list, size_t index)
 {
-  struct elem zero = {0};
+  elem_t zero = {0};
   if(list->size < index)
     {
       errno = EINVAL;

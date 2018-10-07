@@ -1,8 +1,9 @@
-#ifndef __INLUPP1_H__
-#define __INLUPP1_H__
 #pragma once
+//#ifndef __INLUPP1_H__
+//#define __INLUPP1_H__
+
 #include <stdbool.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 
 typedef struct elem elem_t;
 typedef struct link link_t;
@@ -73,4 +74,6 @@ void ioopm_iterator_reset(ioopm_list_iterator_t *iter);
 int ioopm_iterator_current(ioopm_list_iterator_t *iter);
 void ioopm_iterator_destroy(ioopm_list_iterator_t *iter);
 */
-#endif
+
+
+//#endif

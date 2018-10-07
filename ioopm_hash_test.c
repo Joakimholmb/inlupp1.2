@@ -1,7 +1,10 @@
+#include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 #include "CUnit/Basic.h"
 #include "hash_table.h"
+#include "list_linked.h"
+#include <errno.h>
 
 
 // FIXA OPTION_T problem
@@ -9,6 +12,11 @@ struct option
 {
   bool defined;
   char *value;
+};
+
+struct elem
+{
+  int32_t i;
 };
 
 
@@ -254,11 +262,11 @@ void test_getkeys1()
   ioopm_hash_table_insert(ht, 3, "333");
   ioopm_hash_table_insert(ht, 12, "421");
 
-  int *keys = ioopm_hash_table_keys(ht);
+  ioopm_list_t *keys = ioopm_hash_table_keys(ht);
 
   
-  CU_ASSERT_EQUAL(keys[0], 3);
-  CU_ASSERT_EQUAL(keys[1], 12);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(keys, 0).i, 3);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(keys, 1).i, 12);
   
   free(keys);
   ioopm_hash_table_destroy(ht);
@@ -268,10 +276,10 @@ void test_getkeys2()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
-  int *keys = ioopm_hash_table_keys(ht);
+  ioopm_list_t *keys = ioopm_hash_table_keys(ht);
 
   
-  CU_ASSERT_PTR_NULL(keys[0]);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(keys, 0).i, 0);
   //CU_ASSERT_EQUAL(keys[16], NULL);
   
   free(keys);
@@ -282,12 +290,12 @@ void test_getkeys3()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
-  int *keys = ioopm_hash_table_keys(ht);
+  ioopm_list_t *keys = ioopm_hash_table_keys(ht);
 
   ioopm_hash_table_insert(ht, 5, "59");
   ioopm_hash_table_remove(ht, 5);
   
-  CU_ASSERT_PTR_NULL(keys[0]);
+  CU_ASSERT_EQUAL(ioopm_linked_list_get(keys, 0).i, 0);
   
   free(keys);
   ioopm_hash_table_destroy(ht);
