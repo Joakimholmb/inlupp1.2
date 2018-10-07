@@ -5,6 +5,12 @@
 //#include "iterator.h" //FIXA SÅ HÄMTA TVÅ MODULER BROR
 #include <errno.h>
 
+struct elem
+{
+  int32_t i;
+};
+
+
 int init_suite(void)
 {
   return 0;
@@ -19,7 +25,8 @@ int clean_suite(void)
 void test_get1()
 {
   ioopm_list_t *list = ioopm_linked_list_create();
-  ioopm_linked_list_insert(list, 0, 5);
+  struct elem five = {5};
+  ioopm_linked_list_insert(list, 0, five);
   CU_ASSERT_EQUAL(ioopm_linked_list_get(list, 0), 5);
   
   ioopm_linked_list_destroy(list);
@@ -278,8 +285,45 @@ void test_iter_reset1()
   ioopm_iterator_reset(iterator);
   CU_ASSERT_EQUAL(ioopm_iterator_current(iterator), 3)
 
+    ioopm_iterator_destroy(iterator);
+    ioopm_linked_list_destroy(list);
+}
+
+//************** REMOVE TEST ***************
+
+void test_iter_remove1()
+{
+  ioopm_list_t *list = ioopm_linked_list_create();
+  ioopm_list_iterator_t *iterator = ioopm_list_iterator(list);
+  ioopm_iterator_insert(iterator, 5);
+  ioopm_iterator_insert(iterator, 3);
+  ioopm_iterator_remove(iterator);
+  CU_ASSERT_EQUAL(ioopm_iterator_current(iterator), 5)
+
   ioopm_iterator_destroy(iterator);
   ioopm_linked_list_destroy(list);
+}
+
+void test_iter_remove2()
+{
+  ioopm_list_t *list = ioopm_linked_list_create();
+  ioopm_list_iterator_t *iterator = ioopm_list_iterator(list);
+  ioopm_iterator_insert(iterator, 5);
+  ioopm_iterator_insert(iterator, 3);
+  ioopm_iterator_insert(iterator, 2);
+
+  
+  ioopm_iterator_next(iterator);
+  ioopm_iterator_remove(iterator);
+  CU_ASSERT_EQUAL(ioopm_iterator_current(iterator), 5);
+  /*
+  ioopm_iterator_reset(iterator);
+  CU_ASSERT_EQUAL(ioopm_iterator_current(iterator), 2);
+  */
+  
+  ioopm_iterator_destroy(iterator);
+  ioopm_linked_list_destroy(list);
+  
 }
 
 //******************
@@ -298,6 +342,7 @@ int main()
   CU_pSuite pSuiteIterInsert = NULL;
   CU_pSuite pSuiteIterHasNext = NULL;
   CU_pSuite pSuiteIterReset = NULL;
+  CU_pSuite pSuiteIterRemove = NULL;
   
   if (CUE_SUCCESS != CU_initialize_registry())
     return CU_get_error();
@@ -389,8 +434,6 @@ int main()
 
 
 
-
-
   
   //Iterator_insert suite
   pSuiteIterInsert = CU_add_suite("Iter_Insert Suite", init_suite, clean_suite);
@@ -405,7 +448,7 @@ int main()
       CU_cleanup_registry();
       return CU_get_error();
     }
-
+  
   
   //Iterator_has_next SUITE
   pSuiteIterHasNext = CU_add_suite("Iter_has_next Suite", init_suite, clean_suite);
@@ -434,9 +477,21 @@ int main()
       CU_cleanup_registry();
       return CU_get_error();
     }
-  
 
-  
+  //Iterator_remove SUITE
+  pSuiteIterRemove = CU_add_suite("Iter_remove Suite", init_suite, clean_suite);
+  if(NULL == pSuiteIterRemove)
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  if(NULL == CU_add_test(pSuiteIterRemove, "test of iter_remove1()", test_iter_remove1) || (NULL == CU_add_test(pSuiteIterRemove, "test of iter_remove2()", test_iter_remove2)))
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
   // RUN TESTS
 
   CU_basic_set_mode(CU_BRM_VERBOSE);
