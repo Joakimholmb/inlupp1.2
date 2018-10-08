@@ -1,26 +1,10 @@
-#include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 #include "CUnit/Basic.h"
-#include "hash_table.h"
 #include "list_linked.h"
-#include <errno.h>
+#include "hash_table.h"
+#include "common.h"
 
-
-// FIXA OPTION_T problem
-struct option
-{
-  bool defined;
-  char *value;
-};
-
-struct elem
-{
-  int32_t i;
-};
-
-
-//static FILE* temp_file = NULL;
 
 int init_suite_insert(void)
 {
@@ -140,7 +124,8 @@ void test_lookup1()
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
   for (int i = 0; i < 17; ++i) /// 18 is a bit magical 
     {
-      CU_ASSERT_PTR_NULL(ioopm_hash_table_lookup(ht, i).value);
+      elem_t value = {i};
+      CU_ASSERT_PTR_NULL(ioopm_hash_table_lookup(ht, value).value);
     }
   ioopm_hash_table_destroy(ht);
 }
@@ -151,13 +136,13 @@ void test_insert1()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
   
-  ioopm_hash_table_insert(ht, 6, "5555");
-  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, 6).value, "5555");
-  CU_ASSERT_EQUAL(ioopm_hash_table_lookup(ht, 40).defined, false)
-  ioopm_hash_table_insert(ht, 40, "666");
-  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, 40).value, "666");
-  ioopm_hash_table_insert(ht, 40, "123");
-  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, 40).value, "123");
+  ioopm_hash_table_insert(ht, (elem_t)1, (elem_t*)"23");
+  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, (elem_t)1).value, "23");
+  CU_ASSERT_EQUAL(ioopm_hash_table_lookup(ht, (elem_t)18).defined, false)
+  ioopm_hash_table_insert(ht, EIGHTEEN, STRING50);
+  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, EIGHTEEN).value, STRING50);
+  ioopm_hash_table_insert(ht, EIGHTEEN, STRINGHEJ);
+  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, EIGHTEEN).value, STRINGHEJ);
 
   ioopm_hash_table_destroy(ht);
 }
@@ -278,9 +263,9 @@ void test_getkeys2()
 
   ioopm_list_t *keys = ioopm_hash_table_keys(ht);
 
-  
+   
   CU_ASSERT_EQUAL(ioopm_linked_list_get(keys, 0).i, 0);
-  //CU_ASSERT_EQUAL(keys[16], NULL);
+
   
   free(keys);
   ioopm_hash_table_destroy(ht);
@@ -294,7 +279,7 @@ void test_getkeys3()
 
   ioopm_hash_table_insert(ht, 5, "59");
   ioopm_hash_table_remove(ht, 5);
-  
+
   CU_ASSERT_EQUAL(ioopm_linked_list_get(keys, 0).i, 0);
   
   free(keys);
@@ -326,7 +311,6 @@ void test_getvalues2()
 
   
   CU_ASSERT_EQUAL(values[0], NULL);
-  CU_ASSERT_EQUAL(values[16], NULL);
   
   free(values);
   ioopm_hash_table_destroy(ht);
