@@ -25,5 +25,5 @@ struct option
 typedef bool(*ioopm_apply_function)(elem_t key, elem_t *value, void *extra);
 typedef void(*ioopm_apply_function2)(elem_t key, elem_t **value, void *extra);
 
-typedef elem_t(*hash_func(elem_t *str));
+typedef elem_t(*hash_func)(elem_t *str);
 

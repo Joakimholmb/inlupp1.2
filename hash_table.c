@@ -30,6 +30,7 @@ struct hash_table
 {
   entry_t buckets[17];
   size_t size;
+  hash_func *hash_function; 
 };
 
 // FUNCTION DECLARATIONS
@@ -55,7 +56,7 @@ bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_apply_function pred, voi
 void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_apply_function2 apply_fun, void *arg);
 static bool key_equiv(elem_t key, elem_t *value_ignored, void *x);
 static bool value_equiv(elem_t key_ignored, elem_t *value, void *x);
-
+static elem_t string_knr_hash(elem_t *str);
 
 
 // **************************
@@ -388,7 +389,7 @@ static entry_t *find_previous_entry_for_key(entry_t *entry, elem_t entrykey)
 
 // **********************
 
-elem_t string_knr_hash(elem_t *str)
+static elem_t string_knr_hash(elem_t *str)
 {
   /*
   elem_t result = (elem_t)0;
@@ -401,6 +402,6 @@ elem_t string_knr_hash(elem_t *str)
     {
       result.i = result.i * ascii.i + *(str->c);
     }
-  while (++(str->c) != '\0'); 
+  while (++*(str->c) != '\0'); 
   return result;
 }

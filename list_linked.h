@@ -22,7 +22,7 @@ elem_t ioopm_linked_list_remove(ioopm_list_t *list, size_t index);
 
 int ioopm_linked_list_size(ioopm_list_t *list);
 bool ioopm_linked_list_is_empty(ioopm_list_t *list);
-bool ioopm_linked_list_contains(ioopm_list_t *list, elem_t element, bool (*compare)(elem_t, elem_t));
+bool ioopm_linked_list_contains(ioopm_list_t *list, elem_t element, bool (*ioopm_eq_function)(elem_t, elem_t));
 
 bool ioopm_linked_list_all(ioopm_list_t *list, bool (*prop)(elem_t, elem_t), void *x);
 bool ioopm_linked_list_any(ioopm_list_t *list, bool (*prop)(elem_t, elem_t), void *x);

@@ -242,19 +242,17 @@ void test_clear3()
 
 void test_getkeys1()
 {
-  
+
   ioopm_hash_table_t *ht = ioopm_hash_table_create(); 
   
   ioopm_hash_table_insert(ht, (elem_t)3, (elem_t*)"333");
-  ioopm_hash_table_insert(ht, (elem_t)12, (elem_t*)"421");
   
   ioopm_list_t *keys = ioopm_hash_table_keys(ht);
 
   
   CU_ASSERT_EQUAL(ioopm_linked_list_get(keys, 0).i, 3);
-  CU_ASSERT_EQUAL(ioopm_linked_list_get(keys, 1).i, 12);
   
-  free(keys);
+  ioopm_linked_list_destroy(keys);
   ioopm_hash_table_destroy(ht);
   
 }
@@ -269,7 +267,7 @@ void test_getkeys2()
   CU_ASSERT_EQUAL(ioopm_linked_list_get(keys, 0).i, 0);
 
   
-  free(keys);
+  ioopm_linked_list_destroy(keys);
   ioopm_hash_table_destroy(ht);
 }
 
@@ -284,13 +282,13 @@ void test_getkeys3()
 
   CU_ASSERT_EQUAL(ioopm_linked_list_get(keys, 0).i, 0);
   
-  free(keys);
+  ioopm_linked_list_destroy(keys);
   ioopm_hash_table_destroy(ht);
 }
 
 void test_getvalues1()
 {
-  /*
+  
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
   ioopm_hash_table_insert(ht, (elem_t)3, (elem_t*)"333");
@@ -305,7 +303,7 @@ void test_getvalues1()
   free(values);
   
   ioopm_hash_table_destroy(ht);
-  */
+  
 }
 
 void test_getvalues2()
@@ -323,7 +321,7 @@ void test_getvalues2()
 
 void test_getvalues3()
 {
-  /*
+  
   ioopm_hash_table_t *ht = ioopm_hash_table_create();
 
   elem_t **values = ioopm_hash_table_values(ht);
@@ -335,7 +333,7 @@ void test_getvalues3()
   
   free(values);
   ioopm_hash_table_destroy(ht);
-  */
+  
 }
 
 void test_haskey1()

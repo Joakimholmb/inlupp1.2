@@ -216,6 +216,43 @@ void test_apply_to_all2()
   ioopm_linked_list_destroy(list);
 }
 
+bool contains_aux(elem_t a, elem_t b)
+{
+  return (a.i == b.i);
+}
+
+void test_contains1()
+{
+  /*
+  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_linked_list_insert(list, 0, FIVE);
+
+  CU_ASSERT_TRUE(ioopm_linked_list_contains(list, FIVE, contains_aux));
+
+  ioopm_linked_list_destroy(list);
+  */
+
+  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_linked_list_insert(list, 0, FIVE);
+
+  CU_ASSERT_TRUE(ioopm_linked_list_contains(list, FIVE, contains_aux));
+
+  ioopm_linked_list_destroy(list);
+  
+}
+
+void test_contains2()
+{
+  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_linked_list_insert(list, 0, FIVE);
+
+  CU_ASSERT_FALSE(ioopm_linked_list_contains(list, FOUR, contains_aux));
+
+  ioopm_linked_list_destroy(list);
+  
+  
+}
+
 //************ ITER TESTS ************
 
 void test_iter_insert1()
@@ -364,6 +401,7 @@ int main()
   CU_pSuite pSuiteListAll = NULL;
   CU_pSuite pSuiteListAny = NULL;
   CU_pSuite pSuiteApplyAll = NULL;
+  CU_pSuite pSuiteContains = NULL;
   CU_pSuite pSuiteIterInsert = NULL;
   CU_pSuite pSuiteIterHasNext = NULL;
   CU_pSuite pSuiteIterReset = NULL;
@@ -452,6 +490,21 @@ int main()
     }
 
   if(NULL == CU_add_test(pSuiteApplyAll, "test of apply_all1()", test_apply_to_all1) || (NULL == CU_add_test(pSuiteApplyAll, "test of apply_all2()", test_apply_to_all2)))
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  // CONTAINS SUITE
+
+  pSuiteContains = CU_add_suite("Contains Suite", init_suite, clean_suite);
+  if(NULL == pSuiteContains)
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  if(NULL == CU_add_test(pSuiteContains, "test of contains1()", test_contains1) || (NULL == CU_add_test(pSuiteContains, "test of contains2()", test_contains2)))
     {
       CU_cleanup_registry();
       return CU_get_error();
