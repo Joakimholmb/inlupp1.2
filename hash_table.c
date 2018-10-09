@@ -388,3 +388,19 @@ static entry_t *find_previous_entry_for_key(entry_t *entry, elem_t entrykey)
 
 // **********************
 
+elem_t string_knr_hash(elem_t *str)
+{
+  /*
+  elem_t result = (elem_t)0;
+  elem_t ascii = (elem_t)32;
+  */
+  elem_t result = {.i = 0};
+  elem_t ascii = {.i = 32};
+  
+  do
+    {
+      result.i = result.i * ascii.i + *(str->c);
+    }
+  while (++(str->c) != '\0'); 
+  return result;
+}
