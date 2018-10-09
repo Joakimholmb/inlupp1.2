@@ -37,7 +37,7 @@ struct hash_table
 
 ioopm_hash_table_t *ioopm_hash_table_create();
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t *value);
-static entry_t *find_previous_entry_for_key(entry_t *entry, elem_t key);
+entry_t *find_previous_entry_for_key(entry_t *entry, elem_t key);
 static entry_t *entry_create(elem_t key, elem_t *value, entry_t *next);
 option_t ioopm_hash_table_lookup(ioopm_hash_table_t *ht, elem_t key);
 elem_t *ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key);
@@ -48,7 +48,7 @@ size_t ioopm_hash_table_size(ioopm_hash_table_t *ht);
 bool ioopm_hash_table_is_empty(ioopm_hash_table_t *ht);
 void ioopm_hash_table_clear(ioopm_hash_table_t *ht);
 ioopm_list_t *ioopm_hash_table_keys(ioopm_hash_table_t *ht);
-elem_t **ioopm_hash_table_values(ioopm_hash_table_t *ht);
+ioopm_list_t *ioopm_hash_table_values(ioopm_hash_table_t *ht);
 bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, elem_t key);
 bool ioopm_hash_table_has_value(ioopm_hash_table_t *ht, elem_t *value);
 bool ioopm_hash_table_all(ioopm_hash_table_t *ht, ioopm_apply_function pred, void *arg);
@@ -56,7 +56,7 @@ bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_apply_function pred, voi
 void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_apply_function2 apply_fun, void *arg);
 static bool key_equiv(elem_t key, elem_t *value_ignored, void *x);
 static bool value_equiv(elem_t key_ignored, elem_t *value, void *x);
-static elem_t string_knr_hash(elem_t *str);
+elem_t string_knr_hash(elem_t *str);
 
 
 // **************************
@@ -259,6 +259,8 @@ int *ioopm_hash_table_keys(ioopm_hash_table_t *ht)
   return keys;
 }
 */
+// OLD VALUE FUNC BEFORE LINKED LIST RETURN HEJ
+/*
 elem_t **ioopm_hash_table_values(ioopm_hash_table_t *ht)
 {
   elem_t **values = calloc(1, sizeof(ht->size));
@@ -275,6 +277,25 @@ elem_t **ioopm_hash_table_values(ioopm_hash_table_t *ht)
         }
     }
   return values;
+}
+*/
+
+ioopm_list_t *ioopm_hash_table_values(ioopm_hash_table_t *ht)
+{
+  ioopm_list_t *list = ioopm_linked_list_create(0);
+  int j = 0;
+  for(int i = 0; i<No_Buckets; ++i)
+    {
+      entry_t *dummy_entry = &ht->buckets[i];
+      entry_t *entry = dummy_entry->next;
+      while (entry != NULL)
+        {
+          ioopm_linked_list_insert(list, j, *(entry->value));
+          ++j;
+          entry = entry->next;
+        }
+    }
+  return list;
 }
 
 bool ioopm_hash_table_has_key(ioopm_hash_table_t *ht, elem_t key)
@@ -374,7 +395,7 @@ static bool value_equiv(elem_t key_ignored, elem_t *value, void *x)
 
 // **************** RECURSIVE find_previous_entry_for_key, NOT ORIGINAL
 
-static entry_t *find_previous_entry_for_key(entry_t *entry, elem_t entrykey)
+entry_t *find_previous_entry_for_key(entry_t *entry, elem_t entrykey)
 {
 
   entry_t *cursor = entry;
@@ -389,7 +410,7 @@ static entry_t *find_previous_entry_for_key(entry_t *entry, elem_t entrykey)
 
 // **********************
 
-static elem_t string_knr_hash(elem_t *str)
+elem_t string_knr_hash(elem_t *str)
 {
   /*
   elem_t result = (elem_t)0;
@@ -397,11 +418,12 @@ static elem_t string_knr_hash(elem_t *str)
   */
   elem_t result = {.i = 0};
   elem_t ascii = {.i = 32};
+  char *s = str->buf;
   
   do
     {
-      result.i = result.i * ascii.i + *(str->c);
+      result.i = result.i * ascii.i + *s;
     }
-  while (++*(str->c) != '\0'); 
+  while (*++s != '\0'); 
   return result;
 }

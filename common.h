@@ -10,6 +10,7 @@ typedef union
   float f;
   void *p;
   char *c;
+  char buf[50];
   int32_t* ip;
   unsigned int* up;
   float* fp;

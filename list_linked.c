@@ -259,7 +259,7 @@ bool ioopm_linked_list_contains(ioopm_list_t *list, elem_t element, bool (*compa
   //ioopm_eq_function cmp = list->func;
   while(cursor != NULL)
     {
-      if (compare(cursor->element, element))
+      if ((compare(cursor->element, element)))
         {
           return true;
         }
