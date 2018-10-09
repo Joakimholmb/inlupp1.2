@@ -10,6 +10,10 @@ typedef union
   float f;
   void *p;
   char *c;
+  int32_t* ip;
+  unsigned int* up;
+  float* fp;
+  
 } elem_t;
 
 struct option
