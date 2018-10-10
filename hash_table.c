@@ -30,12 +30,12 @@ struct hash_table
 {
   entry_t buckets[17];
   size_t size;
-  hash_func *hash_function; 
+  hash_func func; 
 };
 
 // FUNCTION DECLARATIONS
 
-ioopm_hash_table_t *ioopm_hash_table_create();
+ioopm_hash_table_t *ioopm_hash_table_create(hash_func func);
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value);
 entry_t *find_previous_entry_for_key(entry_t *entry, elem_t key);
 static entry_t *entry_create(elem_t key, elem_t value, entry_t *next);
@@ -56,7 +56,7 @@ bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_apply_function pred, voi
 void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_apply_function2 apply_fun, void *arg);
 static bool key_equiv(elem_t key, elem_t value_ignored, void *x);
 static bool value_equiv(elem_t key_ignored, elem_t value, void *x);
-elem_t string_knr_hash(elem_t str);
+int string_knr_hash(elem_t str);
 
 // **************************
 
@@ -84,9 +84,10 @@ ioopm_list_t *ioopm_hash_table_keys(ioopm_hash_table_t *ht)
   return list;
 }
 
-ioopm_hash_table_t *ioopm_hash_table_create()
+ioopm_hash_table_t *ioopm_hash_table_create(hash_func func)
 { 
   ioopm_hash_table_t *result = calloc(1, sizeof(ioopm_hash_table_t));
+  result->func = func;
 
   return result;
 }
@@ -94,10 +95,22 @@ ioopm_hash_table_t *ioopm_hash_table_create()
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value)
 {
 
+  int int_key = 0;
+  
+  if (ht->func == NULL)
+  {
+    // treat keys as integers
+    int_key = key.i; // .i reads the integer part of the elem_t
+  }
+else
+  {
+    int_key = ht->func(key); 
+  }
+
   //elem_t hash = string_knr_hash(key);
   //int bucket = hash.i % No_Buckets;
   
-  int bucket = key.i % No_Buckets;
+  int bucket = int_key % No_Buckets;
 
   entry_t *entry = find_previous_entry_for_key(&ht->buckets[bucket], key);
   entry_t *next = entry->next;
@@ -394,9 +407,9 @@ static bool key_equiv(elem_t key, elem_t value_ignored, void *x)
     }
   else
     {
-      elem_t key_compare1 = string_knr_hash(key);
-      elem_t key_compare2 = string_knr_hash(other_key);
-      return (key_compare1.i == key_compare2.i);
+      int key_compare1 = string_knr_hash(key);
+      int key_compare2 = string_knr_hash(other_key);
+      return (key_compare1 == key_compare2);
     }
   return false;
   
@@ -427,19 +440,19 @@ entry_t *find_previous_entry_for_key(entry_t *entry, elem_t entrykey)
 
 // **********************
 
-elem_t string_knr_hash(elem_t str)
+int string_knr_hash(elem_t str)
 {
   /*
   elem_t result = (elem_t)0;
   elem_t ascii = (elem_t)32;
   */
-  elem_t result = {.i = 0};
-  elem_t ascii = {.i = 32};
+  int result = 0;
+  int ascii = 32;
   char *s = str.c;
   
   do
     {
-      result.i = result.i * ascii.i + *s;
+      result = result * ascii + *s;
     }
   while (*++s != '\0');
   return result;
