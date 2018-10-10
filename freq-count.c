@@ -11,7 +11,7 @@
 struct entry
 {
   elem_t key;       // holds the key
-  elem_t *value;   // holds the value
+  elem_t value;   // holds the value
   entry_t *next; // points to the next entry (possibly NULL)
 };
 
@@ -57,20 +57,25 @@ void sort_keys(char *keys[], size_t no_keys)
 
 void process_word(char *word, ioopm_hash_table_t *ht)
 {
-  printf("%s\n", word);
-  elem_t key = (elem_t*) { .buf = word};
+  //printf("%s\n", word);
+  elem_t key;
+  key.c = strdup(word);
   if(ioopm_hash_table_has_key(ht, key))
     {
-      entry_t *previous = find_previous_entry_for_key(&ht->buckets[0], key);
-      puts(key.buf);
-      previous->next->value += 1;
+      
+      key.i += 1;
+      elem_t hash = string_knr_hash(key);
+      int bucket = hash.i % 17;
+      entry_t *previous = find_previous_entry_for_key(&ht->buckets[bucket], key);
+      previous->value.i += 1;
       return;
     }
   else
     {
-      ioopm_hash_table_insert(ht, key, (elem_t*)1);
+      ioopm_hash_table_insert(ht, key, (elem_t)1);
     }
 }
+
 
 void process_file(char *filename, ioopm_hash_table_t *ht)
 {
@@ -115,17 +120,20 @@ int main(int argc, char *argv[])
 
       /// FIXME: obtain an array of keys to sort them
       ioopm_list_t *list = ioopm_hash_table_keys(ht);
+      ioopm_list_t *values = ioopm_hash_table_values(ht);
+      
       link_t *link = list->first;
+      link_t *link2 = values->first;
       char *buf[555];
-      for (int i = 0; i < list->size; ++i)
+      for (size_t i = 0; i < list->size; ++i)
         {
-          buf[i]  = link->element.buf;
-          puts(buf[i]);
+          buf[i] = strdup(link->element.c);
+          printf("word = %s, freq = %d\n", buf[i], link2->element.i);
           link = link->next;
+          link2 = link2->next;
         }
-      //char *keys[] = { "Bb", "Dd", "Aa", "Cc", "Hh", "Ff", "Gg" };
       sort_keys(buf, list->size);
-      for (int i = 0; i < list->size; ++i) puts(buf[i]);
+      //for (size_t i = 0; i < list->size; ++i) printf(buf[i]);
     }
   else
     {
