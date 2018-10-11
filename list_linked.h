@@ -11,7 +11,7 @@ typedef bool (*ioopm_eq_function)(elem_t a, elem_t b);
 
 // ************** LIST_LINKED FUNC DECLARATIONS ************
 
-ioopm_list_t *ioopm_linked_list_create(ioopm_eq_function *compare);
+ioopm_list_t *ioopm_linked_list_create(ioopm_eq_function compare);
 void ioopm_linked_list_destroy(ioopm_list_t *list);
 void ioopm_linked_list_insert(ioopm_list_t *list, size_t index, elem_t value);
 elem_t ioopm_linked_list_get(ioopm_list_t *list, size_t index);
@@ -22,10 +22,10 @@ elem_t ioopm_linked_list_remove(ioopm_list_t *list, size_t index);
 
 int ioopm_linked_list_size(ioopm_list_t *list);
 bool ioopm_linked_list_is_empty(ioopm_list_t *list);
-bool ioopm_linked_list_contains(ioopm_list_t *list, elem_t element, bool (*ioopm_eq_function)(elem_t, elem_t));
+bool ioopm_linked_list_contains(ioopm_list_t *list, elem_t element);
 
-bool ioopm_linked_list_all(ioopm_list_t *list, bool (*prop)(elem_t, elem_t), void *x);
-bool ioopm_linked_list_any(ioopm_list_t *list, bool (*prop)(elem_t, elem_t), void *x);
+bool ioopm_linked_list_all(ioopm_list_t *list, void *x);
+bool ioopm_linked_list_any(ioopm_list_t *list, void *x);
 void ioopm_linked_apply_to_all(ioopm_list_t *list, void (*fun)(elem_t *, elem_t *), void *x);
 
 

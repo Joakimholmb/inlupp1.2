@@ -2,17 +2,9 @@
 #include <string.h>
 #include "CUnit/Basic.h"
 #include "list_linked.h"
+#include "common.h"
 //#include "iterator.h" //FIXA SÅ HÄMTA TVÅ MODULER BROR
 #include <errno.h>
-
-union elem
-{
-  int32_t i;
-  unsigned int u;
-  bool b;
-  float f;
-  void *p;
-};
 
 const elem_t THREE = {3};
 const elem_t FOUR = {4};
@@ -33,7 +25,7 @@ int clean_suite(void)
 
 void test_get1()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(NULL);
   //elem_t five = {5};
   ioopm_linked_list_insert(list, 0, FIVE);
   CU_ASSERT_EQUAL(ioopm_linked_list_get(list, 0).i, 5);
@@ -66,7 +58,7 @@ void test_get3()
 
 void test_get4()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(NULL);
   CU_ASSERT_EQUAL(ioopm_linked_list_get(list, 0).i, 0);
   CU_ASSERT_EQUAL(ioopm_linked_list_get(list, 1).i, 0);
   
@@ -75,7 +67,7 @@ void test_get4()
 
 void test_remove1()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(NULL);
   ioopm_linked_list_remove(list, 3);
   CU_ASSERT_EQUAL(ioopm_linked_list_get(list, 3).i, 0);
   
@@ -84,7 +76,7 @@ void test_remove1()
 
 void test_remove2()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(NULL);
   ioopm_linked_list_insert(list, 0, FIVE);
   ioopm_linked_list_insert(list, 1, FOUR);
   ioopm_linked_list_remove(list, 0);
@@ -95,7 +87,7 @@ void test_remove2()
 
 void test_remove3()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(NULL);
   
   ioopm_linked_list_insert(list, 0, FIVE);
   ioopm_linked_list_insert(list, 1, FOUR);
@@ -108,7 +100,7 @@ void test_remove3()
 
 void test_size1()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(NULL);
   ioopm_linked_list_insert(list, 0, FIVE);
   ioopm_linked_list_append(list, FOUR);
   ioopm_linked_list_prepend(list, THREE);
@@ -127,57 +119,57 @@ bool aux_list_all(elem_t x, elem_t y)
 
 void test_list_all1()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
-  ioopm_linked_list_insert(list, 0, FIVE);
-  ioopm_linked_list_insert(list, 1, FIVE);
-  ioopm_linked_list_insert(list, 2, FIVE);
-  int x = 5;
-  int *y = &x;
-  CU_ASSERT_TRUE(ioopm_linked_list_all(list, aux_list_all, y));
+ioopm_list_t *list = ioopm_linked_list_create(aux_list_all);
+ioopm_linked_list_insert(list, 0, FIVE);
+ioopm_linked_list_insert(list, 1, FIVE);
+ioopm_linked_list_insert(list, 2, FIVE);
+int x = 5;
+int *y = &x;
+CU_ASSERT_TRUE(ioopm_linked_list_all(list, y));
 
-  ioopm_linked_list_destroy(list);
+ioopm_linked_list_destroy(list);
 }
 
 void test_list_all2()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(aux_list_all);
   int x = 5;
   int *y = &x;
-  CU_ASSERT_FALSE(ioopm_linked_list_all(list, aux_list_all, y));
+  CU_ASSERT_FALSE(ioopm_linked_list_all(list, y));
 
   ioopm_linked_list_destroy(list);
 }
 
 void test_list_any1()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(aux_list_all);
   ioopm_linked_list_insert(list, 0, FIVE);
   ioopm_linked_list_insert(list, 1, FOUR);
   ioopm_linked_list_insert(list, 2, THREE);
   elem_t x = {4};
   elem_t *y = &x;
-  CU_ASSERT_TRUE(ioopm_linked_list_any(list, aux_list_all, y));
+  CU_ASSERT_TRUE(ioopm_linked_list_any(list, y));
 
   ioopm_linked_list_destroy(list);
 }
 
 void test_list_any2()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(aux_list_all);
   int x = 5;
   int *y = &x;
-  CU_ASSERT_FALSE(ioopm_linked_list_any(list, aux_list_all, y));
+  CU_ASSERT_FALSE(ioopm_linked_list_any(list, y));
 
   ioopm_linked_list_destroy(list);
 }
 
 void test_list_any3()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(aux_list_all);
   ioopm_linked_list_insert(list, 0, FOUR);
   int x = 5;
   int *y = &x;
-  CU_ASSERT_FALSE(ioopm_linked_list_any(list, aux_list_all, y));
+  CU_ASSERT_FALSE(ioopm_linked_list_any(list, y));
 
   ioopm_linked_list_destroy(list);
 }
@@ -190,7 +182,7 @@ void aux_apply_to_all(elem_t *x, elem_t *y)
 
 void test_apply_to_all1()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(aux_list_all);
   ioopm_linked_list_insert(list, 0, FIVE);
   ioopm_linked_list_insert(list, 1, FOUR);
 
@@ -198,20 +190,19 @@ void test_apply_to_all1()
   elem_t *y = &x;
   ioopm_linked_apply_to_all(list, aux_apply_to_all, y);
 
-  CU_ASSERT_TRUE(ioopm_linked_list_all(list, aux_list_all, y));
+  CU_ASSERT_TRUE(ioopm_linked_list_all(list, y));
   
   ioopm_linked_list_destroy(list);
 }
-
 void test_apply_to_all2()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+ioopm_list_t *list = ioopm_linked_list_create(aux_list_all);
 
   elem_t x = {10};
   elem_t *y = &x;
   ioopm_linked_apply_to_all(list, aux_apply_to_all, y);
 
-  CU_ASSERT_FALSE(ioopm_linked_list_all(list, aux_list_all, y));
+  CU_ASSERT_FALSE(ioopm_linked_list_all(list, y));
   
   ioopm_linked_list_destroy(list);
 }
@@ -232,10 +223,10 @@ void test_contains1()
   ioopm_linked_list_destroy(list);
   */
 
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(contains_aux);
   ioopm_linked_list_insert(list, 0, FIVE);
 
-  CU_ASSERT_TRUE(ioopm_linked_list_contains(list, FIVE, contains_aux));
+  CU_ASSERT_TRUE(ioopm_linked_list_contains(list, FIVE));
 
   ioopm_linked_list_destroy(list);
   
@@ -243,13 +234,12 @@ void test_contains1()
 
 void test_contains2()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(contains_aux);
   ioopm_linked_list_insert(list, 0, FIVE);
 
-  CU_ASSERT_FALSE(ioopm_linked_list_contains(list, FOUR, contains_aux));
+  CU_ASSERT_FALSE(ioopm_linked_list_contains(list, FOUR));
 
   ioopm_linked_list_destroy(list);
-  
   
 }
 
@@ -257,7 +247,7 @@ void test_contains2()
 
 void test_iter_insert1()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(NULL);
   ioopm_list_iterator_t *iterator = ioopm_list_iterator(list);
   ioopm_iterator_insert(iterator, FIVE);
   CU_ASSERT_EQUAL(ioopm_iterator_current(iterator).i, 5);
@@ -270,7 +260,7 @@ void test_iter_insert1()
 
 void test_iter_insert2()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(NULL);
   ioopm_list_iterator_t *iterator = ioopm_list_iterator(list);
   ioopm_iterator_insert(iterator, FIVE);
   CU_ASSERT_EQUAL(ioopm_iterator_current(iterator).i, 5);
@@ -285,7 +275,7 @@ void test_iter_insert2()
 
 void test_iter_insert3()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(NULL);
   ioopm_list_iterator_t *iterator = ioopm_list_iterator(list);
   ioopm_iterator_insert(iterator, FIVE);
   ioopm_iterator_insert(iterator, FOUR);
@@ -301,7 +291,7 @@ void test_iter_insert3()
 
 void test_iter_has_next1()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(NULL);
   ioopm_list_iterator_t *iterator = ioopm_list_iterator(list);
   CU_ASSERT_FALSE(ioopm_iterator_has_next(iterator));
 
@@ -311,7 +301,7 @@ void test_iter_has_next1()
 
 void test_iter_has_next2()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(NULL);
   ioopm_list_iterator_t *iterator = ioopm_list_iterator(list);
   ioopm_iterator_insert(iterator, FIVE);
   ioopm_iterator_insert(iterator, FOUR);
@@ -325,7 +315,7 @@ void test_iter_has_next2()
 
 void test_iter_reset1()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(NULL);
   ioopm_list_iterator_t *iterator = ioopm_list_iterator(list);
   ioopm_iterator_insert(iterator, FIVE);
   ioopm_iterator_insert(iterator, FOUR);
@@ -341,7 +331,7 @@ void test_iter_reset1()
 
 void test_iter_remove1()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(NULL);
   ioopm_list_iterator_t *iterator = ioopm_list_iterator(list);
   ioopm_iterator_insert(iterator, FIVE);
   ioopm_iterator_insert(iterator, FOUR);
@@ -359,7 +349,7 @@ void test_iter_remove1()
 
 void test_iter_remove2()
 {
-  ioopm_list_t *list = ioopm_linked_list_create(0);
+  ioopm_list_t *list = ioopm_linked_list_create(NULL);
   ioopm_list_iterator_t *iterator = ioopm_list_iterator(list);
   ioopm_iterator_insert(iterator, FIVE);
   ioopm_iterator_insert(iterator, FOUR);

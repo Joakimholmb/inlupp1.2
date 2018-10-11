@@ -18,7 +18,7 @@ struct list
   link_t *first;
   size_t size;
   link_t *last;
-  ioopm_eq_function *func;
+  ioopm_eq_function func;
 };
 
 struct iter 
@@ -34,8 +34,8 @@ struct iter
 
 static link_t *link_new(link_t *next, elem_t value);
 static link_t *find_previous_link(ioopm_list_t *list, size_t index);
-ioopm_list_t *ioopm_linked_list_create(ioopm_eq_function *compare);
-void ioopm_linked_list_destroy(ioopm_list_t *list); 
+ioopm_list_t *ioopm_linked_list_create(ioopm_eq_function compare);
+void ioopm_linked_list_destroy(ioopm_list_t *list);
 void ioopm_linked_list_insert(ioopm_list_t *list, size_t index, elem_t value);
 elem_t ioopm_linked_list_get(ioopm_list_t *list, size_t index);
 void ioopm_linked_list_append(ioopm_list_t *list, elem_t value);
@@ -44,9 +44,9 @@ void ioopm_linked_list_clear(ioopm_list_t *list);
 elem_t ioopm_linked_list_remove(ioopm_list_t *list, size_t index);
 int ioopm_linked_list_size(ioopm_list_t *list);
 bool ioopm_linked_list_is_empty(ioopm_list_t *list);
-bool ioopm_linked_list_contains(ioopm_list_t *list, elem_t element, bool (*ioopm_eq_function)(elem_t, elem_t));
-bool ioopm_linked_list_all(ioopm_list_t *list, bool (*prop)(elem_t, elem_t), void *x);
-bool ioopm_linked_list_any(ioopm_list_t *list, bool (*prop)(elem_t, elem_t), void *x);
+bool ioopm_linked_list_contains(ioopm_list_t *list, elem_t element);
+bool ioopm_linked_list_all(ioopm_list_t *list, void *x);
+bool ioopm_linked_list_any(ioopm_list_t *list, void *x);
 void ioopm_linked_apply_to_all(ioopm_list_t *list, void (*fun)(elem_t *, elem_t *), void *x);
 
 
@@ -98,7 +98,7 @@ static link_t *find_previous_link(ioopm_list_t *list, size_t index)
   return cursor;
 }
 
-ioopm_list_t *ioopm_linked_list_create(ioopm_eq_function *compare)
+ioopm_list_t *ioopm_linked_list_create(ioopm_eq_function compare)
 {
   ioopm_list_t *result = calloc(1, sizeof(ioopm_list_t));
   result->func = compare;
@@ -253,13 +253,13 @@ bool ioopm_linked_list_is_empty(ioopm_list_t *list)
   return (ioopm_linked_list_size(list) == 0);
 }
 
-bool ioopm_linked_list_contains(ioopm_list_t *list, elem_t element, bool (*compare)(elem_t a, elem_t b))
+bool ioopm_linked_list_contains(ioopm_list_t *list, elem_t element)
+                                //bool (*compare)(elem_t a, elem_t b))
 {
   link_t *cursor = list->first;
-  //ioopm_eq_function cmp = list->func;
   while(cursor != NULL)
     {
-      if ((compare(cursor->element, element)))
+      if ((list->func(cursor->element, element)))
         {
           return true;
         }
@@ -269,12 +269,12 @@ bool ioopm_linked_list_contains(ioopm_list_t *list, elem_t element, bool (*compa
   return false;  
 }
 
-bool ioopm_linked_list_all(ioopm_list_t *list, bool (*prop)(elem_t, elem_t), void *x)
+bool ioopm_linked_list_all(ioopm_list_t *list, void *x)
 
 {
   link_t *cursor = list->first;
   elem_t *elem_compare = x;
-
+  
   if(cursor == NULL)
     {
       return false;
@@ -283,7 +283,7 @@ bool ioopm_linked_list_all(ioopm_list_t *list, bool (*prop)(elem_t, elem_t), voi
     {
       while(cursor != NULL)
         {
-          if (prop(cursor->element, *elem_compare))
+          if (list->func(cursor->element, *elem_compare))
             {
               cursor = cursor->next;
             }
@@ -297,14 +297,14 @@ bool ioopm_linked_list_all(ioopm_list_t *list, bool (*prop)(elem_t, elem_t), voi
   return true;
 }
 
-bool ioopm_linked_list_any(ioopm_list_t *list, bool (*prop)(elem_t, elem_t), void *x)
+bool ioopm_linked_list_any(ioopm_list_t *list, void *x)
 
 {
   link_t *cursor = list->first;
   elem_t *elem_compare = x;
   while(cursor != NULL)
     {
-      if (prop(cursor->element, *elem_compare))
+      if (list->func(cursor->element, *elem_compare))
         {
           return true;
         }

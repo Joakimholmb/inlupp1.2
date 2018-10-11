@@ -15,6 +15,7 @@ Hur placera in den i h. filen.
 #include <stdio.h>
 #include <stdbool.h>
 #include <CUnit/CUnit.h>
+#include <assert.h>
 #include "list_linked.h"
 #include "hash_table.h"
 #define No_Buckets 17
@@ -37,7 +38,7 @@ struct hash_table
 
 ioopm_hash_table_t *ioopm_hash_table_create(hash_func func);
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value);
-entry_t *find_previous_entry_for_key(entry_t *entry, elem_t key);
+entry_t *find_previous_entry_for_key(ioopm_hash_table_t *ht, entry_t *entry, elem_t entrykey);
 static entry_t *entry_create(elem_t key, elem_t value, entry_t *next);
 option_t ioopm_hash_table_lookup(ioopm_hash_table_t *ht, elem_t key);
 elem_t ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key);
@@ -56,8 +57,8 @@ bool ioopm_hash_table_any(ioopm_hash_table_t *ht, ioopm_apply_function pred, voi
 void ioopm_hash_table_apply_to_all(ioopm_hash_table_t *ht, ioopm_apply_function2 apply_fun, void *arg);
 static bool key_equiv(elem_t key, elem_t value_ignored, void *x);
 static bool value_equiv(elem_t key_ignored, elem_t value, void *x);
-int string_knr_hash(elem_t str);
-
+int32_t string_knr_hash(elem_t str);
+int key_extract_int(elem_t key);
 // **************************
 
 //        FUNCTIONS
@@ -106,13 +107,10 @@ else
   {
     int_key = ht->func(key); 
   }
-
-  //elem_t hash = string_knr_hash(key);
-  //int bucket = hash.i % No_Buckets;
   
-  int bucket = int_key % No_Buckets;
+  int bucket = abs(int_key % No_Buckets);
 
-  entry_t *entry = find_previous_entry_for_key(&ht->buckets[bucket], key);
+  entry_t *entry = find_previous_entry_for_key(ht, &ht->buckets[bucket], key);
   entry_t *next = entry->next;
 
   if (next != NULL && next->key.i == key.i)
@@ -161,9 +159,21 @@ static entry_t *entry_create(elem_t key, elem_t value, entry_t *next)
 
 option_t ioopm_hash_table_lookup(ioopm_hash_table_t *ht, elem_t key)
 {
-  entry_t *tmp = find_previous_entry_for_key(&ht->buckets[key.i % No_Buckets], key);
+  int int_key = 0;
+  
+  if (ht->func == NULL)
+  {
+    int_key = key.i;
+  }
+else
+  {
+    int_key = ht->func(key); 
+  }
+  
+  int bucket = abs(int_key % No_Buckets);
+  key = (elem_t)int_key;
+  entry_t *tmp = find_previous_entry_for_key(ht, &ht->buckets[bucket], key);
   entry_t *next = tmp->next;
-
   if (next && next->value.i && next->key.i == key.i)
     {
       return (option_t) { .defined = true, .value = next->value };
@@ -176,7 +186,7 @@ option_t ioopm_hash_table_lookup(ioopm_hash_table_t *ht, elem_t key)
 
 elem_t ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key)
 {
-  entry_t *previous = find_previous_entry_for_key(&ht->buckets[key.i % No_Buckets], key);
+  entry_t *previous = find_previous_entry_for_key(ht, &ht->buckets[key.i % No_Buckets], key);
   
   if(previous->next != NULL)
     {
@@ -424,29 +434,65 @@ static bool value_equiv(elem_t key_ignored, elem_t value, void *x)
 }
 
 // **************** RECURSIVE find_previous_entry_for_key, NOT ORIGINAL
-
+/*
 entry_t *find_previous_entry_for_key(entry_t *entry, elem_t entrykey)
 {
 
   entry_t *cursor = entry;
   entry_t *entry_next = cursor->next;
-
+ 
   if(entry_next == NULL || entry_next->key.i == entrykey.i || entrykey.i < entry_next->key.i)
     {
       return cursor;
     }
-  return find_previous_entry_for_key(entry_next, entrykey);
+*/
+// KOMMENTAR ONSPOT
+  /*
+  else if (string_knr_hash(entry->next->key) == string_knr_hash(entrykey))
+    {
+      return cursor;
+    }
+  */
+// KOMMENTERA UT HÄR
+/*
+    return find_previous_entry_for_key(entry_next, entrykey);
 }
+*/
+
+
+
+entry_t *find_previous_entry_for_key(ioopm_hash_table_t *ht, entry_t *entry, elem_t entrykey)
+{
+
+  entry_t *cursor = entry;
+  entry_t *entry_next = cursor->next;
+ 
+  if(entry_next == NULL || entry_next->key.i == entrykey.i || entrykey.i < entry_next->key.i)
+    {
+      return cursor;
+    }
+  else if (ht->func(entry->next->key) == ht->func(entrykey))
+    {
+      return cursor;
+    }
+
+  return find_previous_entry_for_key(ht, entry_next, entrykey);
+}
+
+
+
+
+    
 
 // **********************
 
-int string_knr_hash(elem_t str)
+int32_t string_knr_hash(elem_t str)
 {
   /*
   elem_t result = (elem_t)0;
   elem_t ascii = (elem_t)32;
   */
-  int result = 0;
+  int32_t result = 0;
   int ascii = 32;
   char *s = str.c;
   
@@ -456,4 +502,9 @@ int string_knr_hash(elem_t str)
     }
   while (*++s != '\0');
   return result;
+}
+
+int  key_extract_int(elem_t key)
+{
+  return key.i;
 }

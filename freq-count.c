@@ -57,26 +57,23 @@ void sort_keys(char *keys[], size_t no_keys)
 
 void process_word(char *word, ioopm_hash_table_t *ht)
 {
-  //printf("%s\n", word);
-  puts("wow\n");
+  printf("%s\n", word);
   elem_t key;
   key.c = strdup(word);
-  //ht->func = string_knr_hash(key);
   
   if(ioopm_hash_table_has_key(ht, key))
     {
       
-      
-      //entry_t *previous = find_previous_entry_for_key(&ht->buckets[ht->func(key).i], key);
-      entry_t *previous = find_previous_entry_for_key(&ht->buckets[(ht->func(key) % 17)], key);
-      previous->value.i += 1;
-      printf("%s", previous->key.c);
+     
+      entry_t *previous = find_previous_entry_for_key(ht, &ht->buckets[abs(ht->func(key) % 17)], key);
+      previous->next->value.i += 1;
+
       return;
     }
   else
     {
       ioopm_hash_table_insert(ht, key, (elem_t)1);
-      printf("%s", key.c);
+
     }
 }
 
@@ -111,6 +108,8 @@ void process_file(char *filename, ioopm_hash_table_t *ht)
   fclose(f);
 }
 
+
+
 int main(int argc, char *argv[])
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash);
@@ -122,25 +121,26 @@ int main(int argc, char *argv[])
           process_file(argv[i], ht);
         }
 
-      /// FIXME: obtain an array of keys to sort them
+
       ioopm_list_t *list = ioopm_hash_table_keys(ht);
-      ioopm_list_t *values = ioopm_hash_table_values(ht);
+
       link_t *link = list->first;
-      link_t *link2 = values->first;
       char **buf = calloc(ht->size, sizeof(char *));
       for (size_t i = 0; i < list->size; ++i)
         {
           buf[i] = strdup(link->element.c);
-          //printf("word = %s, freq = %d\n", buf[i], link2->element.i);
           link = link->next;
-          link2 = link2->next;
         }
       sort_keys(buf, list->size);
       for (size_t i = 0; i < list->size; ++i)
         {
-          printf(buf[i]);
-          printf("freq: %d\n", ioopm_hash_table_lookup(ht, (elem_t)buf[i]).value.i);
+
+          elem_t key = (elem_t)buf[i];
+          entry_t *previous = find_previous_entry_for_key(ht, &ht->buckets[abs(ht->func(key) % 17)], key);
+
+          printf("%s, freq: %d\n", buf[i], previous->next->value.i);
         }
+      puts("done");
     }
   else
     {

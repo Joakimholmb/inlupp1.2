@@ -121,7 +121,7 @@ int clean_suite_All(void)
 
 void test_lookup1()
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(NULL);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(key_extract_int);
   for (int i = 0; i < 17; ++i) /// 18 is a bit magical 
     {
       elem_t value = (elem_t)i;
@@ -134,7 +134,7 @@ void test_lookup1()
 
 void test_insert1()
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(NULL);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(key_extract_int);
   
   ioopm_hash_table_insert(ht, (elem_t)1, (elem_t)"23");
   CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, (elem_t)1).value.c, "23");
