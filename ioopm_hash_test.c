@@ -4,7 +4,13 @@
 #include "list_linked.h"
 #include "hash_table.h"
 #include "common.h"
-
+struct hash_table
+{
+  size_t no_buckets;
+  entry_t *buckets;  
+  size_t size;
+  hash_func func; 
+};
 
 int init_suite_insert(void)
 {
@@ -449,9 +455,25 @@ void test_all()
   ioopm_hash_table_insert(ht, (elem_t)6, fifty_two);
 
   
-  CU_ASSERT_TRUE(ioopm_hash_table_all(ht, aux_all, NULL))
+  CU_ASSERT_TRUE(ioopm_hash_table_all(ht, aux_all, NULL));
   
   ioopm_hash_table_destroy(ht);
+}
+
+void test_resize()
+{
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(key_extract_int);
+
+  for(int i=10; i<60; ++i)
+    {
+     
+      ioopm_hash_table_insert(ht, (elem_t)i, (elem_t)i);
+    }
+
+  
+  CU_ASSERT_EQUAL(ioopm_hash_table_lookup(ht, (elem_t)50).value.i, 50);
+  
+    ioopm_hash_table_destroy(ht);
 }
 
 
@@ -473,6 +495,7 @@ int main()
   CU_pSuite pSuiteHasValue = NULL;
   CU_pSuite pSuiteApplyToAll = NULL;
   CU_pSuite pSuiteAll = NULL;
+  CU_pSuite pSuiteResize = NULL;
 
   if (CUE_SUCCESS != CU_initialize_registry())
     return CU_get_error();
@@ -634,6 +657,21 @@ int main()
     }
 
   if(NULL == CU_add_test(pSuiteAll, "test of All()", test_all))
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  // RESIZE SUITE
+
+  pSuiteResize = CU_add_suite("test of Resize", init_suite_All, clean_suite_All);
+  if(NULL == pSuiteResize)
+    {
+      CU_cleanup_registry();
+      return CU_get_error();
+    }
+
+  if(NULL == CU_add_test(pSuiteResize, "test of resize()", test_resize))
     {
       CU_cleanup_registry();
       return CU_get_error();

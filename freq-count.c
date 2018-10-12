@@ -17,7 +17,8 @@ struct entry
 
 struct hash_table
 {
-  entry_t buckets[17];
+  size_t no_buckets;
+  entry_t *buckets;  
   size_t size;
   hash_func func; 
 };
@@ -65,7 +66,7 @@ void process_word(char *word, ioopm_hash_table_t *ht)
     {
       
      
-      entry_t *previous = find_previous_entry_for_key(ht, &ht->buckets[abs(ht->func(key) % 17)], key);
+      entry_t *previous = find_previous_entry_for_key(ht, &ht->buckets[abs(ht->func(key) % ht->no_buckets)], key);
       previous->next->value.i += 1;
 
       return;
@@ -136,7 +137,7 @@ int main(int argc, char *argv[])
         {
 
           elem_t key = (elem_t)buf[i];
-          entry_t *previous = find_previous_entry_for_key(ht, &ht->buckets[abs(ht->func(key) % 17)], key);
+          entry_t *previous = find_previous_entry_for_key(ht, &ht->buckets[abs(ht->func(key) % ht->no_buckets)], key);
 
           printf("%s, freq: %d\n", buf[i], previous->next->value.i);
         }

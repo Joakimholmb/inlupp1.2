@@ -9,6 +9,8 @@ typedef struct entry entry_t;
 typedef struct hash_table ioopm_hash_table_t;
 typedef struct option option_t;
 
+void ioopm_dynamic_hash_table_create(ioopm_hash_table_t *ht);
+void ioopm_hash_table_resize(ioopm_hash_table_t *ht);
 ioopm_hash_table_t *ioopm_hash_table_create(hash_func func);
 entry_t *find_previous_entry_for_key(ioopm_hash_table_t *ht, entry_t *entry, elem_t entrykey);
 void ioopm_hash_table_insert(ioopm_hash_table_t *ht, elem_t key, elem_t value);
