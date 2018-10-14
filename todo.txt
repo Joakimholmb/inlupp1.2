@@ -1,0 +1,18 @@
+TODO:
+Error handling i hash_table.c saknas, har vi gjort rätt annars?? //Har inte ens importerat errno.h, vet inte vad som kan anses vara "korrekt" error-handling
+
+Dokumentation!! //Mest error handling men dokumentet nämner dokumentation lite drygt 10 ggr för olika designval
+
+Se om apply_to_all i ht/list_linked ska använda funktionen i structen för ht/LL
+LL användet list->func direkt i funktionen, HT använder bara ht->func i testfilen. bör vara mer konsekvent
+
+Se över namngivning (ex ioopm_apply_function2) //De mesta ser OK ut, ändrat entrykey i find_previous i ht till entry_key
+
+Makefile namngivning //ändrat alla körbara kommandon, runtest1 blev ht_test, runtest2 blev ll_test, valtest blev ht_valgrind osv
+
+Iterator.c, iterator.h //Fixat! Har även snyggat till ordentligen i våra #includes
+
+Se om vi kan fixa valgrind errors (unconditional jumps) //Beror enligt google antagligen på unitialized value nånstans
+
+
+

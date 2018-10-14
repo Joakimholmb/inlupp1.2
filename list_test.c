@@ -3,13 +3,12 @@
 #include "CUnit/Basic.h"
 #include "list_linked.h"
 #include "common.h"
-//#include "iterator.h" //FIXA SÅ HÄMTA TVÅ MODULER BROR
+#include "iterator.h" //FIXA SÅ HÄMTA TVÅ MODULER BROR
 #include <errno.h>
 
 const elem_t THREE = {3};
 const elem_t FOUR = {4};
 const elem_t FIVE = {5};
-//const ioopm_eq_function FUNC_IGNORED = ignore_func(THREE, THREE);
 
 int init_suite(void)
 {

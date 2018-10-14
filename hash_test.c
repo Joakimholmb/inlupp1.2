@@ -1,9 +1,7 @@
-#include <string.h>
-#include <stdlib.h>
 #include "CUnit/Basic.h"
 #include "list_linked.h"
 #include "hash_table.h"
-#include "common.h"
+
 struct hash_table
 {
   size_t no_buckets;
