@@ -73,7 +73,8 @@ void process_word(char *word, ioopm_hash_table_t *ht)
     }
   else
     {
-      ioopm_hash_table_insert(ht, key, (elem_t)1);
+      elem_t one = {1};
+      ioopm_hash_table_insert(ht, key, one);
 
     }
 }
@@ -135,8 +136,7 @@ int main(int argc, char *argv[])
       sort_keys(buf, list->size);
       for (size_t i = 0; i < list->size; ++i)
         {
-
-          elem_t key = (elem_t)buf[i];
+          elem_t key = {.c = buf[i]};
           entry_t *previous = find_previous_entry_for_key(ht, &ht->buckets[abs(ht->func(key) % ht->no_buckets)], key);
 
           printf("%s, freq: %d\n", buf[i], previous->next->value.i);

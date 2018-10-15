@@ -18,8 +18,8 @@ struct option
   elem_t value;
 };
 
-typedef bool(*ioopm_apply_function)(elem_t key, elem_t value, void *extra);
-typedef void(*ioopm_apply_function2)(elem_t key, elem_t *value, void *extra);
+typedef bool(*ioopm_apply_function_bool)(elem_t key, elem_t value, void *extra);
+typedef void(*ioopm_apply_function_void)(elem_t key, elem_t *value, void *extra);
 typedef bool (*ioopm_eq_function)(elem_t a, elem_t b);
 typedef int(*hash_func)(elem_t str);
 

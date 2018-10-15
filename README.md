@@ -1,19 +1,24 @@
 # Inlupp 1
 
-I denna fil, _skall_ du skriva instruktioner för
-- hur man bygger programmet
-- hur man kör programmet
-- hur man kör testerna till programmet
-- övrig information att behöva känna till för bygg/körning
+make freq-count #Bygg programmet
 
-Idealet _bör_ vara att samtliga bygg-/körsteg kan kontrolleras mha `make`:
-- `make` för att bygga programmet
-- `make test` för att bygga och köra testerna i `valgrind`
-- `make run` för att köra programmet (samt först bygga, om så inte är gjort)
+./freq-count FIL.txt #Kör programmet
 
-Kom slutligen ihåg deadlines. Dessa hittar du på kurshemsidan: [klicka
-här](http://wrigstad.com/ioopm18/#org2090f8e).
+make test #Bygg testfiler
 
-Happy hacking!
-/ Tobias & labassarna
+make run #Kör testfil
+
+
+Error-hantering:
+I hash_table_lookup returneras en strukt option_t, som returnernar en bool och ett värde om bool är sann. Om boolen är falsk säger vi att värdet ej är definierat.
+
+Errors hanteras annars i errno.h. I den här modulen används enbart EINVAL i ett fåtal fall. Om fel argument skickas in så returneras 0 på formen elem_t
+
+
+
+Designval:
+
+Det är upp till användaren att börja programmet med create (för hash_table, list_linked och iterator) och avsluta med destroy för att undvika minnesläckor. Beteendet om användaren kör funktioner utan att första köra create är odefinierat.
+
+Om du kallar hash_table_keys och hash_table_values på samma hashtabell kommer de länkade listorna keys och values motsvara en unik entry i hashtabellen på varje index.
 

@@ -33,7 +33,7 @@ int clean_suite(void)
 
 void test_lookup1()
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(key_extract_int);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_key_extract_int);
   for (int i = 0; i < 17; ++i) /// 18 is a bit magical 
     {
       elem_t value = {i};
@@ -46,7 +46,7 @@ void test_lookup1()
 
 void test_insert1()
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(key_extract_int);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_key_extract_int);
   
   ioopm_hash_table_insert(ht, ONE, SHEJ);
   CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, ONE).value.c, "hej");
@@ -340,7 +340,7 @@ void test_apply_to_all()
 
 bool aux_all(elem_t key_ignored, elem_t value, void *x)
 {
-  elem_t compare = FIFTY;
+  elem_t compare = S10;
   return (value.i == compare.i);
   
 }
@@ -361,7 +361,7 @@ void test_all()
 
 void test_resize()
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(key_extract_int);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_key_extract_int);
 
   for(int i=10; i<60; ++i)
     {

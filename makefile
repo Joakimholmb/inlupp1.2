@@ -4,15 +4,16 @@ WFLAGS = -Wall -pedantic -g -pg
 FLAGS = -Wall -pedantic -g -std=c11
 TEST = -lcunit
 VALTEST = valgrind --leak-check=full
+TFLAGS = -fprofile-arcs -ftest-coverage
 
-# ALL FILES
-all: freq_count hash_table hash_test hash_valgrind list_linked iterator list_test list_valgrind
-
+# BUILD FILES
 test: hash_test list_test
+
+run: hash_valgrind list_valgrind
 
 # C. FILES
 freq-count: freq-count.c hash_table.o list_linked.o iterator.o
-	$(CC) $(WFLAGS) -o freq-count freq-count.c hash_table.o list_linked.o iterator.o
+	$(CC) $(WFLAGS) freq-count.c -o freq-count hash_table.o list_linked.o iterator.o
 
 hash_table: hash_table.c list_linked.c
 	$(CC) $(FLAGS) -c -o hash_table hash_table.c
@@ -25,14 +26,14 @@ iterator: iterator.c
 
 # TESTFILES
 hash_test: hash_test.c hash_table.o list_linked.o iterator.o
-	$(CC) $(FLAGS) -o $@ $< hash_table.o list_linked.o iterator.o $(TEST)
-	./$@
+	$(CC) $(FLAGS) $(TFLAGS) -o $@ $< hash_table.o list_linked.o iterator.o $(TEST)
+	#./$@
 
 list_test: list_test.c list_linked.o iterator.o
 	$(CC) $(FLAGS) -o $@ $< list_linked.o iterator.o $(TEST)               
-	./$@
+	#./$@
 
-# VALGRIND
+#nVALGRIND
 hash_valgrind: hash_test
 	$(VALTEST) ./hash_test
 
