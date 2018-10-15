@@ -2,6 +2,13 @@
 #include "list_linked.h"
 #include "hash_table.h"
 
+const elem_t ONE = {3};
+const elem_t TWO = {4};
+const elem_t THREE = {5};
+const elem_t SHEJ = {"hej"};
+const elem_t S10 = {"10"};
+const elem_t S333 = {"333"};
+
 struct hash_table
 {
   size_t no_buckets;
@@ -10,112 +17,12 @@ struct hash_table
   hash_func func; 
 };
 
-int init_suite_insert(void)
+int init_suite(void)
 {
   return 0;
 }
 
-int clean_suite_insert(void)
-{
-  return 0;
-}
-
-int init_suite_lookup(void)
-{
-  return 0;
-}
-
-int clean_suite_lookup(void)
-{
-  return 0;
-}
-
-int init_suite_remove(void)
-{
-  return 0;
-}
-
-int clean_suite_remove(void)
-{
-  return 0;
-}
-
-int init_suite_size(void)
-{
-  return 0;
-}
-
-int clean_suite_size(void)
-{
-  return 0;
-}
-
-int init_suite_clear(void)
-{
-  return 0;
-}
-
-int clean_suite_clear(void)
-{
-  return 0;
-}
-
-int init_suite_getkeys(void)
-{
-  return 0;
-}
-
-int clean_suite_getkeys(void)
-{
-  return 0;
-}
-
-int init_suite_getvalues(void)
-{
-  return 0;
-}
-
-int clean_suite_getvalues(void)
-{
-  return 0;
-}
-
-int init_suite_haskey(void)
-{
-  return 0;
-}
-
-int clean_suite_haskey(void)
-{
-  return 0;
-}
-
-int init_suite_hasvalue(void)
-{
-  return 0;
-}
-
-int clean_suite_hasvalue(void)
-{
-  return 0;
-}
-
-int init_suite_ApplyToAll(void)
-{
-  return 0;
-}
-
-int clean_suite_ApplyToAll(void)
-{
-  return 0;
-}
-
-int init_suite_All(void)
-{
-  return 0;
-}
-
-int clean_suite_All(void)
+int clean_suite(void)
 {
   return 0;
 }
@@ -128,7 +35,7 @@ void test_lookup1()
   ioopm_hash_table_t *ht = ioopm_hash_table_create(key_extract_int);
   for (int i = 0; i < 17; ++i) /// 18 is a bit magical 
     {
-      elem_t value = (elem_t)i;
+      elem_t value = {i};
       CU_ASSERT_EQUAL(ioopm_hash_table_lookup(ht, value).value.c, NULL);
     }
   ioopm_hash_table_destroy(ht);
@@ -140,13 +47,13 @@ void test_insert1()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create(key_extract_int);
   
-  ioopm_hash_table_insert(ht, (elem_t)1, (elem_t)"23");
-  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, (elem_t)1).value.c, "23");
-  CU_ASSERT_EQUAL(ioopm_hash_table_lookup(ht, (elem_t)18).defined, false)
-  ioopm_hash_table_insert(ht, (elem_t)18, (elem_t)"50");
-  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, (elem_t)18).value.c, "50");
-  ioopm_hash_table_insert(ht, (elem_t)18, (elem_t)"hej");
-  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, (elem_t)18).value.c, "hej");
+  ioopm_hash_table_insert(ht, ONE, SHEJ);
+  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, ONE).value.c, "hej");
+  CU_ASSERT_EQUAL(ioopm_hash_table_lookup(ht, TWO).defined, false)
+  ioopm_hash_table_insert(ht, TWO, S10);
+  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, TWO).value.c, "10");
+  ioopm_hash_table_insert(ht, TWO, SHEJ);
+  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, TWO.value.c, "hej");
 
   ioopm_hash_table_destroy(ht);
 }
@@ -499,7 +406,7 @@ int main()
     return CU_get_error();
 
   // LOOKUP SUITE
-  pSuiteLookup = CU_add_suite("lookup Suite", init_suite_lookup, clean_suite_lookup);
+  pSuiteLookup = CU_add_suite("lookup Suite", init_suite, clean_suite);
   if(NULL == pSuiteLookup)
     {
       CU_cleanup_registry();
@@ -513,7 +420,7 @@ int main()
     }
 
   // INSERT SUITE
-  pSuiteInsert = CU_add_suite("Insert Suite", init_suite_insert, clean_suite_insert);
+  pSuiteInsert = CU_add_suite("Insert Suite", init_suite, clean_suite);
   if(NULL == pSuiteInsert)
     {
       CU_cleanup_registry();
@@ -527,7 +434,7 @@ int main()
     }
 
   // REMOVE SUITE
-  pSuiteRemove = CU_add_suite("Remove Suite", init_suite_remove, clean_suite_remove);
+  pSuiteRemove = CU_add_suite("Remove Suite", init_suite, clean_suite);
   if(NULL == pSuiteRemove)
     {
       CU_cleanup_registry();
@@ -542,7 +449,7 @@ int main()
 
   // SIZE SUITE
 
-  pSuiteSize = CU_add_suite("Size Suite", init_suite_size, clean_suite_size);
+  pSuiteSize = CU_add_suite("Size Suite", init_suite, clean_suite);
   if(NULL == pSuiteSize)
     {
       CU_cleanup_registry();
@@ -557,7 +464,7 @@ int main()
 
   // CLEAR SUITE
 
-  pSuiteClear = CU_add_suite("Clear Suite", init_suite_clear, clean_suite_clear);
+  pSuiteClear = CU_add_suite("Clear Suite", init_suite, clean_suite);
   if(NULL == pSuiteClear)
     {
       CU_cleanup_registry();
@@ -572,7 +479,7 @@ int main()
 
   // GETKEYS SUITE
 
-  pSuiteGetKeys = CU_add_suite("GetKeys Suite", init_suite_getkeys, clean_suite_getkeys);
+  pSuiteGetKeys = CU_add_suite("GetKeys Suite", init_suite, clean_suite);
   if(NULL == pSuiteGetKeys)
     {
       CU_cleanup_registry();
@@ -587,7 +494,7 @@ int main()
 
   // GETVALUES SUITE
 
-  pSuiteGetValues = CU_add_suite("Getvalues Suite", init_suite_getvalues, clean_suite_getvalues);
+  pSuiteGetValues = CU_add_suite("Getvalues Suite", init_suite, clean_suite);
   if(NULL == pSuiteGetValues)
     {
       CU_cleanup_registry();
@@ -602,7 +509,7 @@ int main()
 
   // HASKEY SUITE
   
-  pSuiteHasKey = CU_add_suite("HasKey Suite", init_suite_haskey, clean_suite_haskey);
+  pSuiteHasKey = CU_add_suite("HasKey Suite", init_suite, clean_suite);
   if(NULL == pSuiteHasKey)
     {
       CU_cleanup_registry();
@@ -617,7 +524,7 @@ int main()
   
   // HASVALUE SUITE
 
-  pSuiteHasValue = CU_add_suite("Hasvalue Suite", init_suite_hasvalue, clean_suite_hasvalue);
+  pSuiteHasValue = CU_add_suite("Hasvalue Suite", init_suite, clean_suite);
   if(NULL == pSuiteHasValue)
     {
       CU_cleanup_registry();
@@ -632,7 +539,7 @@ int main()
 
   // APPLTOALL SUITE
 
-  pSuiteApplyToAll = CU_add_suite("ApplyToAll Suite", init_suite_ApplyToAll, clean_suite_ApplyToAll);
+  pSuiteApplyToAll = CU_add_suite("ApplyToAll Suite", init_suite, clean_suite);
   if(NULL == pSuiteApplyToAll)
     {
       CU_cleanup_registry();
@@ -647,7 +554,7 @@ int main()
 
   // APPLTOALL SUITE
 
-  pSuiteAll = CU_add_suite("All Suite", init_suite_All, clean_suite_All);
+  pSuiteAll = CU_add_suite("All Suite", init_suite, clean_suite);
   if(NULL == pSuiteAll)
     {
       CU_cleanup_registry();
@@ -662,7 +569,7 @@ int main()
 
   // RESIZE SUITE
 
-  pSuiteResize = CU_add_suite("test of Resize", init_suite_All, clean_suite_All);
+  pSuiteResize = CU_add_suite("test of Resize", init_suite, clean_suite);
   if(NULL == pSuiteResize)
     {
       CU_cleanup_registry();

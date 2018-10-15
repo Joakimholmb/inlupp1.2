@@ -7,6 +7,8 @@ VALTEST = valgrind --leak-check=full
 # ALL FILES
 all: freq_count hash_table hash_test hash_valgrind list_linked iterator list_test list_valgrind
 
+test: hash_test list_test
+
 # C. FILES
 freq-count: freq-count.c hash_table.o list_linked.o iterator.o
 	$(CC) $(FLAGS) -pg -o freq-count freq-count.c hash_table.o list_linked.o iterator.o
