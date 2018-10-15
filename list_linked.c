@@ -21,13 +21,6 @@ struct list
   ioopm_eq_function func;
 };
 
-struct iter 
-{
-  link_t *prev;
-  link_t *current;
-  ioopm_list_t *list;
-};
-
 // ************** LIST_LINKED FUNC DECLARATIONS ************
 
 static link_t *link_new(link_t *next, elem_t value);

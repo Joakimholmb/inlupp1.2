@@ -103,7 +103,6 @@ ioopm_list_t *ioopm_hash_table_keys(ioopm_hash_table_t *ht)
       entry_t *entry = dummy_entry->next;
       while (entry != NULL)
         {
-          
           ioopm_linked_list_insert(list, j, entry->key);
           ++j;
           entry = entry->next;
@@ -405,7 +404,7 @@ entry_t *ioopm_find_previous_entry_for_key(ioopm_hash_table_t *ht, entry_t *entr
 
 // ***** HASH_TABLE FUNCS *****
 
-int ioopm_string_knr_hash_t(elem_t str)
+int ioopm_string_knr_hash(elem_t str)
 {
   int result = 0;
   int ascii = 32;
@@ -419,7 +418,7 @@ int ioopm_string_knr_hash_t(elem_t str)
   return result;
 }
 
-int ioopm_key_extract_int_t(elem_t key)
+int ioopm_key_extract_int(elem_t key)
 {
   return key.i;
 }

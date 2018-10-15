@@ -309,7 +309,6 @@ void test_hasvalue3()
 
 void aux_apply_to_all(elem_t key_ignored, elem_t *value, void *x)
 {
-  //(*value)[1] = '\0';
 
   *value = THREE;
 
@@ -321,14 +320,6 @@ void test_apply_to_all()
 {
   ioopm_hash_table_t *ht = ioopm_hash_table_create(NULL);
   
-  /*
-  ioopm_hash_table_insert(ht, (elem_t)2, (elem_t)str);
-  ioopm_hash_table_insert(ht, (elem_t)30, (elem_t)str2);
-
-  ioopm_hash_table_apply_to_all(ht, aux_apply_to_all, NULL);
-  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, (elem_t)2).value, "5");
-  CU_ASSERT_STRING_EQUAL(ioopm_hash_table_lookup(ht, (elem_t)30).value, "8");
-  */
   ioopm_hash_table_insert(ht, ONE, TWO);
 
   ioopm_hash_table_apply_to_all(ht, aux_apply_to_all, NULL);

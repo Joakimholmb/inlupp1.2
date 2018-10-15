@@ -66,7 +66,7 @@ void process_word(char *word, ioopm_hash_table_t *ht)
     {
       
      
-      entry_t *previous = find_previous_entry_for_key(ht, &ht->buckets[abs(ht->func(key) % ht->no_buckets)], key);
+      entry_t *previous = ioopm_find_previous_entry_for_key(ht, &ht->buckets[abs(ht->func(key) % ht->no_buckets)], key);
       previous->next->value.i += 1;
 
       return;
@@ -114,7 +114,7 @@ void process_file(char *filename, ioopm_hash_table_t *ht)
 
 int main(int argc, char *argv[])
 {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(string_knr_hash);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash);
   
   if (argc > 1)
     {
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
       for (size_t i = 0; i < list->size; ++i)
         {
           elem_t key = {.c = buf[i]};
-          entry_t *previous = find_previous_entry_for_key(ht, &ht->buckets[abs(ht->func(key) % ht->no_buckets)], key);
+          entry_t *previous = ioopm_find_previous_entry_for_key(ht, &ht->buckets[abs(ht->func(key) % ht->no_buckets)], key);
 
           printf("%s, freq: %d\n", buf[i], previous->next->value.i);
         }

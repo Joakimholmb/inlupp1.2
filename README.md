@@ -22,3 +22,12 @@ Det är upp till användaren att börja programmet med create (för hash_table, 
 
 Om du kallar hash_table_keys och hash_table_values på samma hashtabell kommer de länkade listorna keys och values motsvara en unik entry i hashtabellen på varje index.
 
+
+Coverage:
+
+File 'hash_test.c'
+Lines executed:82.19% of 292
+
+File 'list_test.c'
+Lines executed:85.89% of 319
+

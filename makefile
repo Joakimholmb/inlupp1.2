@@ -30,7 +30,7 @@ hash_test: hash_test.c hash_table.o list_linked.o iterator.o
 	#./$@
 
 list_test: list_test.c list_linked.o iterator.o
-	$(CC) $(FLAGS) -o $@ $< list_linked.o iterator.o $(TEST)               
+	$(CC) $(FLAGS) $(TFLAGS) -o $@ $< list_linked.o iterator.o $(TEST)               
 	#./$@
 
 #nVALGRIND
